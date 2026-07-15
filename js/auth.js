@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════
-// AUTH — login (teléfono + PIN), logout y estado de sesión
+// AUTH — login (teléfono + PIN casillas), logout y estado
 // ══════════════════════════════════════════════
 
 const loginScreen  = document.getElementById('login-screen');
@@ -7,24 +7,109 @@ const appContent   = document.getElementById('app-content');
 const loginForm    = document.getElementById('login-form');
 const loginError   = document.getElementById('login-error');
 const userEmail    = document.getElementById('user-email');
+const pinHidden    = document.getElementById('login-pin');
+const pinBoxes     = document.querySelectorAll('.pin-box');
 
-// ── LOGIN (teléfono + PIN → email fake en Firebase Auth) ──
+// ── PIN CASILLAS: auto-advance, backspace, paste ──
+function getPinValue() {
+  return Array.from(pinBoxes).map(b => b.value).join('');
+}
+
+function updatePinHidden() {
+  pinHidden.value = getPinValue();
+  // Actualizar estilo de casillas llenas
+  pinBoxes.forEach(b => {
+    b.classList.toggle('filled', b.value.length === 1);
+    b.classList.remove('error');
+  });
+}
+
+function focusPinBox(index) {
+  if (index >= 0 && index < pinBoxes.length) {
+    pinBoxes[index].focus();
+  }
+}
+
+pinBoxes.forEach((box, i) => {
+  // Solo permitir números
+  box.addEventListener('input', (e) => {
+    const val = e.target.value.replace(/[^0-9]/g, '');
+    e.target.value = val;
+
+    if (val && i < pinBoxes.length - 1) {
+      focusPinBox(i + 1);
+    }
+    updatePinHidden();
+
+    // Auto-submit cuando están todos llenos
+    if (getPinValue().length === 6) {
+      loginForm.dispatchEvent(new Event('submit'));
+    }
+  });
+
+  // Backspace: retroceder y borrar
+  box.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace') {
+      if (!box.value && i > 0) {
+        pinBoxes[i - 1].value = '';
+        focusPinBox(i - 1);
+        updatePinHidden();
+      }
+    }
+    // Flechas izquierda/derecha
+    if (e.key === 'ArrowLeft' && i > 0) {
+      e.preventDefault();
+      focusPinBox(i - 1);
+    }
+    if (e.key === 'ArrowRight' && i < pinBoxes.length - 1) {
+      e.preventDefault();
+      focusPinBox(i + 1);
+    }
+  });
+
+  // Seleccionar todo al hacer click
+  box.addEventListener('focus', () => box.select());
+
+  // Pegar desde clipboard
+  box.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const pasted = (e.clipboardData || window.clipboardData)
+      .getData('text')
+      .replace(/[^0-9]/g, '')
+      .slice(0, 6);
+
+    if (pasted) {
+      pasted.split('').forEach((digit, j) => {
+        if (pinBoxes[j]) pinBoxes[j].value = digit;
+      });
+      updatePinHidden();
+      // Focus en la siguiente vacía o la última
+      const nextEmpty = pasted.length < 6 ? pasted.length : 5;
+      focusPinBox(nextEmpty);
+      // Auto-submit si están todos llenos
+      if (pasted.length === 6) {
+        loginForm.dispatchEvent(new Event('submit'));
+      }
+    }
+  });
+});
+
+// ── LOGIN ──
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   loginError.textContent = '';
 
   const phone = document.getElementById('login-phone').value.trim().replace(/\D/g, '');
-  const pin   = document.getElementById('login-pin').value.trim();
+  const pin   = getPinValue();
 
   if (!phone) { loginError.textContent = 'Ingresá tu número de teléfono'; return; }
-  if (!pin || pin.length !== 6) { loginError.textContent = 'El PIN debe tener 6 dígitos'; return; }
+  if (pin.length !== 6) { loginError.textContent = 'El PIN debe tener 6 dígitos'; return; }
 
-  // Formatear como email fake para Firebase Auth
   const fakeEmail = `wc_${phone}@workshop.local`;
 
-  const btn = loginForm.querySelector('button');
+  const btn = loginForm.querySelector('.login-btn');
   btn.disabled = true;
-  btn.textContent = 'Ingresando…';
+  btn.classList.add('loading');
 
   try {
     const { auth, signInWithEmailAndPassword } = window._fb;
@@ -38,8 +123,12 @@ loginForm.addEventListener('submit', async (e) => {
       'auth/network-request-failed': 'Error de red. Checkeá tu conexión',
     };
     loginError.textContent = msgs[err.code] || 'Error al ingresar';
+    // Animar error en casillas
+    pinBoxes.forEach(b => { b.classList.add('error'); b.value = ''; });
+    updatePinHidden();
+    focusPinBox(0);
     btn.disabled = false;
-    btn.textContent = 'Ingresar';
+    btn.classList.remove('loading');
   }
 });
 
@@ -53,25 +142,21 @@ window.cerrarSesion = cerrarSesion;
 // ── AUTH STATE LISTENER ──
 window._fb.onAuthStateChanged(window._fb.auth, (user) => {
   if (user) {
-    // Autenticado → mostrar app
     loginScreen.style.display = 'none';
     appContent.style.display  = 'flex';
-
-    // Mostrar teléfono del usuario (extraer del email fake)
     const phone = user.email?.replace('wc_', '').replace('@workshop.local', '') || user.email;
     userEmail.textContent = phone;
-
-    // Arrancar listeners de datos (solo una vez)
     window._fb.startDataListeners();
-
-    // Resetear botón de login por si quedó en estado "Ingresando…"
-    const btn = loginForm.querySelector('button');
+    // Reset login form
+    const btn = loginForm.querySelector('.login-btn');
     btn.disabled = false;
-    btn.textContent = 'Ingresar';
+    btn.classList.remove('loading');
     loginForm.reset();
+    pinBoxes.forEach(b => { b.value = ''; b.classList.remove('filled', 'error'); });
+    updatePinHidden();
   } else {
-    // No autenticado → mostrar login
     loginScreen.style.display = 'flex';
     appContent.style.display  = 'none';
+    focusPinBox(0);
   }
 });

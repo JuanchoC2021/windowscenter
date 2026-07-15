@@ -19,6 +19,11 @@
      LOGIN SCREEN
 ══════════════════════════════════════════════ -->
 <div id="login-screen">
+  <!-- Blobs animados de fondo -->
+  <div class="login-blob login-blob-1"></div>
+  <div class="login-blob login-blob-2"></div>
+  <div class="login-blob login-blob-3"></div>
+
   <div class="login-card">
     <div class="login-logo">
       <div class="login-logo-mark">WC</div>
@@ -27,10 +32,27 @@
     <div class="login-subtitle">Gestión del Taller</div>
     <form id="login-form">
       <label>Teléfono</label>
-      <input type="tel" id="login-phone" placeholder="Ej: 1155551234" inputmode="numeric" autocomplete="tel" required>
+      <div class="phone-field">
+        <span class="phone-prefix">+54 🇦🇷</span>
+        <input type="tel" id="login-phone" placeholder="11 5555 1234" inputmode="numeric" autocomplete="tel" required>
+      </div>
       <label>PIN</label>
-      <input type="password" id="login-pin" placeholder="••••••" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" autocomplete="current-password" required>
-      <button type="submit" class="login-btn">Ingresar</button>
+      <div class="pin-container">
+        <div class="pin-boxes">
+          <input type="text" class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]" data-pin-index="0" autocomplete="off">
+          <input type="text" class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]" data-pin-index="1" autocomplete="off">
+          <input type="text" class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]" data-pin-index="2" autocomplete="off">
+          <input type="text" class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]" data-pin-index="3" autocomplete="off">
+          <input type="text" class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]" data-pin-index="4" autocomplete="off">
+          <input type="text" class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]" data-pin-index="5" autocomplete="off">
+        </div>
+        <!-- Input oculto para el form submit -->
+        <input type="hidden" id="login-pin" value="">
+      </div>
+      <button type="submit" class="login-btn">
+        <span class="login-btn-text">Ingresar</span>
+        <div class="login-spinner"></div>
+      </button>
     </form>
     <div class="login-error" id="login-error"></div>
   </div>
