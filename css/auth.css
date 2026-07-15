@@ -89,6 +89,13 @@
   color: #484f58;
 }
 
+.login-card input#login-pin {
+  font-family: 'DM Mono', monospace;
+  font-size: 18px;
+  letter-spacing: 8px;
+  text-align: center;
+}
+
 .login-btn {
   width: 100%;
   padding: 13px;

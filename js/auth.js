@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════
-// AUTH — login, logout y estado de sesión
+// AUTH — login (teléfono + PIN), logout y estado de sesión
 // ══════════════════════════════════════════════
 
 const loginScreen  = document.getElementById('login-screen');
@@ -8,18 +8,19 @@ const loginForm    = document.getElementById('login-form');
 const loginError   = document.getElementById('login-error');
 const userEmail    = document.getElementById('user-email');
 
-// ── LOGIN ──
+// ── LOGIN (teléfono + PIN → email fake en Firebase Auth) ──
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   loginError.textContent = '';
 
-  const email = document.getElementById('login-email').value.trim();
-  const pass  = document.getElementById('login-pass').value;
+  const phone = document.getElementById('login-phone').value.trim().replace(/\D/g, '');
+  const pin   = document.getElementById('login-pin').value.trim();
 
-  if (!email || !pass) {
-    loginError.textContent = 'Completá email y contraseña';
-    return;
-  }
+  if (!phone) { loginError.textContent = 'Ingresá tu número de teléfono'; return; }
+  if (!pin || pin.length !== 6) { loginError.textContent = 'El PIN debe tener 6 dígitos'; return; }
+
+  // Formatear como email fake para Firebase Auth
+  const fakeEmail = `wc_${phone}@workshop.local`;
 
   const btn = loginForm.querySelector('button');
   btn.disabled = true;
@@ -27,12 +28,12 @@ loginForm.addEventListener('submit', async (e) => {
 
   try {
     const { auth, signInWithEmailAndPassword } = window._fb;
-    await signInWithEmailAndPassword(auth, email, pass);
+    await signInWithEmailAndPassword(auth, fakeEmail, pin);
   } catch (err) {
     const msgs = {
-      'auth/invalid-credential': 'Email o contraseña incorrectos',
-      'auth/user-not-found':     'Email o contraseña incorrectos',
-      'auth/wrong-password':     'Email o contraseña incorrectos',
+      'auth/invalid-credential': 'Teléfono o PIN incorrectos',
+      'auth/user-not-found':     'Teléfono o PIN incorrectos',
+      'auth/wrong-password':     'Teléfono o PIN incorrectos',
       'auth/too-many-requests':  'Demasiados intentos. Esperá un minuto',
       'auth/network-request-failed': 'Error de red. Checkeá tu conexión',
     };
@@ -55,7 +56,10 @@ window._fb.onAuthStateChanged(window._fb.auth, (user) => {
     // Autenticado → mostrar app
     loginScreen.style.display = 'none';
     appContent.style.display  = 'flex';
-    userEmail.textContent = user.email;
+
+    // Mostrar teléfono del usuario (extraer del email fake)
+    const phone = user.email?.replace('wc_', '').replace('@workshop.local', '') || user.email;
+    userEmail.textContent = phone;
 
     // Arrancar listeners de datos (solo una vez)
     window._fb.startDataListeners();
