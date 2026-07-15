@@ -11,8 +11,36 @@
 <link rel="stylesheet" href="css/gestion.css">
 <link rel="stylesheet" href="css/ordenes.css">
 <link rel="stylesheet" href="css/windowscenter.css">
+<link rel="stylesheet" href="css/auth.css">
 </head>
 <body>
+
+<!-- ══════════════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-mark">WC</div>
+      <div class="login-logo-text">WindowsCenter</div>
+    </div>
+    <div class="login-subtitle">Gestión del Taller</div>
+    <form id="login-form">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="tu@email.com" autocomplete="email" required>
+      <label>Contraseña</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" required>
+      <button type="submit" class="login-btn">Ingresar</button>
+    </form>
+    <div class="login-error" id="login-error"></div>
+  </div>
+  <div class="login-footer">WindowsCenter Pro · Sistema de gestión</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     APP CONTENT (oculto hasta autenticarse)
+══════════════════════════════════════════════ -->
+<div id="app-content" style="display:none;flex-direction:column;min-height:100vh">
 
 <!-- SYNC INDICATOR -->
 <div id="sync-indicator" class="syncing">
@@ -28,6 +56,13 @@
   <div class="main-head" style="flex-shrink:0;flex-direction:column;align-items:stretch;gap:12px">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
       <h2>💰 Gestión del Taller</h2>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="user-badge"><span class="dot"></span><span id="user-email"></span></div>
+        <button class="signout-btn" onclick="cerrarSesion()">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.75C2 1.784 2.784 1 3.75 1h2.5a.75.75 0 0 1 0 1.5h-2.5a.25.25 0 0 0-.25.25v10.5c0 .138.112.25.25.25h2.5a.75.75 0 0 1 0 1.5h-2.5A1.75 1.75 0 0 1 2 13.25Zm10.44-4.75a.75.75 0 0 1 .75-.75h1.06a.25.25 0 0 0 .25-.25V4a.75.75 0 0 1 1.5 0v2.5a1.75 1.75 0 0 1-1.75 1.75H12.19a.75.75 0 0 1-.75-.75ZM6.22 6.22a.75.75 0 0 1 0 1.06L4.56 8.94a.75.75 0 1 1-1.06-1.06l1.66-1.66a.75.75 0 0 1 1.06 0Zm2.56 0a.75.75 0 0 1 1.06 0l1.66 1.66a.75.75 0 1 1-1.06 1.06l-1.66-1.66a.75.75 0 0 1 0-1.06Z"/></svg>
+          Salir
+        </button>
+      </div>
       <div class="stats-row">
         <div class="stat-pill">Mov: <span class="val" id="g-stat-count">0</span></div>
         <div class="stat-pill" style="background:var(--green-bg);border-color:var(--green);color:var(--green)">Ing: <span class="val" id="g-stat-ing">$0</span></div>
@@ -685,10 +720,13 @@
   </div>
 </div>
 
+</div><!-- /app-content -->
+
 <!-- ══════════════════════════════════════════════
      FIREBASE SDK (módulo ES) — init, refs y listeners realtime
-══════════════════════════════════════════════ -->
+═══════════════════════════════════════════════ -->
 <script type="module" src="js/services/firebase.js"></script>
+<script type="module" src="js/auth.js"></script>
 
 <!-- ══════════════════════════════════════════════
      LÓGICA PRINCIPAL (accede a Firebase via window._fb)

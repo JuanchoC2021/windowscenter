@@ -1,0 +1,176 @@
+/* ══════════════════════════════════════════════
+   AUTH — pantalla de login
+   ══════════════════════════════════════════════ */
+
+#login-screen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.login-card {
+  background: #1c2128;
+  border: 1px solid #30363d;
+  border-radius: 16px;
+  padding: 40px 36px;
+  width: 380px;
+  max-width: 92vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.login-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.login-logo-mark {
+  width: 44px;
+  height: 44px;
+  background: var(--blue);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
+  font-size: 16px;
+  letter-spacing: -0.5px;
+}
+
+.login-logo-text {
+  color: white;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.login-subtitle {
+  text-align: center;
+  color: #6e7681;
+  font-size: 13px;
+  margin-bottom: 28px;
+}
+
+.login-card label {
+  color: #8b949e;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.login-card input[type="email"],
+.login-card input[type="password"] {
+  width: 100%;
+  padding: 12px 14px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.15s;
+  margin-bottom: 16px;
+}
+
+.login-card input:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(9,105,218,0.2);
+}
+
+.login-card input::placeholder {
+  color: #484f58;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 13px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-top: 4px;
+}
+
+.login-btn:hover {
+  background: #0860ca;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(9,105,218,0.3);
+}
+
+.login-btn:active {
+  transform: translateY(0);
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.login-error {
+  color: #f85149;
+  font-size: 13px;
+  text-align: center;
+  min-height: 20px;
+  margin-top: 12px;
+}
+
+.login-footer {
+  text-align: center;
+  color: #484f58;
+  font-size: 11px;
+  margin-top: 24px;
+}
+
+/* ── SIGN OUT BUTTON (en el header de la app) ── */
+.signout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--line2);
+  border-radius: 8px;
+  color: var(--ink3);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.signout-btn:hover {
+  background: var(--red-bg);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink3);
+}
+
+.user-badge .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+}
