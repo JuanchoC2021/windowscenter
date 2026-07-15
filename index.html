@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>WindowsCenter Pro</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
@@ -670,61 +668,9 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<!-- MODAL empresa -->
-<div class="modal-backdrop" id="modal-empresa">
-  <div class="modal">
-    <h3>Datos de la empresa</h3>
-    <label>Razón Social</label>
-    <input type="text" id="m-empresa" style="margin-bottom:10px">
-    <label>Teléfono / Email</label>
-    <input type="text" id="m-contacto">
-    <div class="modal-actions">
-      <button class="btn btn-outline btn-sm" onclick="cerrarModal()">Cancelar</button>
-      <button class="btn btn-primary btn-sm" onclick="guardarEmpresa()">Guardar</button>
-    </div>
-  </div>
-</div>
 
-<!-- MODAL editar abertura -->
-<div class="modal-backdrop" id="modal-editar">
-  <div class="modal">
-    <h3>✏️ Editar abertura</h3>
-    <input type="hidden" id="edit-id">
-    <label>Descripción</label>
-    <input type="text" id="edit-descripcion" style="margin-bottom:10px">
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <div style="flex:1">
-        <label>Línea</label>
-        <select id="edit-linea">
-          <option value="modena">Módena (corrediza 45°)</option>
-          <option value="herrero">Herrero (proyectante 90°)</option>
-          <option value="a30">A30 New (corrediza 45°)</option>
-          <option value="vitrum">Vitrum (fijo 45°)</option>
-        </select>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <div style="flex:1"><label>Ancho (cm)</label><input type="number" id="edit-ancho" min="10" max="600"></div>
-      <div style="flex:1"><label>Alto (cm)</label><input type="number" id="edit-alto" min="10" max="600"></div>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <div style="flex:1"><label>Cantidad</label><input type="number" id="edit-cantidad" min="1" max="99"></div>
-      <div style="flex:1">
-        <label>Tipo de Vidrio</label>
-        <select id="edit-vidrio">
-          <option value="1,Float 4mm">Float 4mm</option>
-          <option value="1.5,Reflectivo 6mm">Reflectivo 6mm</option>
-          <option value="2.8,DVH 4+9+4">DVH 4+9+4</option>
-          <option value="3.5,DVH 6+9+6">DVH 6+9+6</option>
-        </select>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline btn-sm" onclick="cerrarModalEditar()">Cancelar</button>
-      <button class="btn btn-primary btn-sm" onclick="guardarEdicion()">💾 Guardar cambios</button>
-    </div>
-  </div>
-</div>
+
+
 
 <!-- CONFIRM DIALOG genérico -->
 <div class="confirm-backdrop" id="confirm-dialog">
@@ -753,9 +699,7 @@
 <script src="js/utils/helpers.js"></script>
 <script src="js/utils/fechas.js"></script>
 <script src="js/utils/excel.js"></script>
-<script src="js/utils/pdf.js"></script>
 
-<script src="js/modules/pedidos.js"></script>
 <script src="js/modules/gestion.js"></script>
 <script src="js/modules/ordenes.js"></script>
 <script src="js/modules/windowscenter.js"></script>

@@ -2,65 +2,8 @@
 // RENDER — Panel de Finanzas / Gestión del Taller
 // ══════════════════════════════════════════════
 
-function renderMovPersona(persona) {
-  const lista = document.getElementById('lista-' + persona);
-  if (!lista) return; // este layout no tiene la mini-lista individual por persona
-  const mov   = window.movimientos.filter(m => m.persona === persona);
-  if (mov.length === 0) { lista.innerHTML = '<div style="padding:30px;text-align:center;color:var(--ink3);font-size:13px">Sin movimientos</div>'; return; }
-  lista.innerHTML = mov.slice().reverse().map(m => {
-    const esIngreso = m.tipo === 'ingreso';
-    const catLabel  = esIngreso ? CATEGORIAS_INGRESO[m.categoria] : CATEGORIAS_GASTO[m.categoria];
-    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line);font-size:12px">
-      <span style="font-size:16px">${esIngreso ? '↑' : '↓'}</span>
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.desc}</div>
-        <div style="color:var(--ink3);font-size:10px">${catLabel} · ${m.fecha}</div>
-      </div>
-      <div style="font-weight:700;color:${esIngreso ? 'var(--green)' : 'var(--red)'}">
-        ${esIngreso ? '+' : '−'}$${m.monto.toLocaleString('es-AR')}
-      </div>
-    </div>`;
-  }).join('');
-}
-
 window.renderGestion = function() {
   const movimientos = window.movimientos || [];
-
-  ['enzo', 'adrian'].forEach(p => {
-    const ing      = movimientos.filter(m => m.persona === p && m.tipo === 'ingreso').reduce((s,m) => s+m.monto, 0);
-    const gas      = movimientos.filter(m => m.persona === p && m.tipo === 'gasto').reduce((s,m) => s+m.monto, 0);
-    // “saldo” de UI lateral debe representar solo favor/debe (gasto-costo - retiro-caja)
-    const saldo     = (p === 'adrian') ? (getSaldoPersonaFavorDebe('adrian', movimientos)) : (getSaldoPersonaFavorDebe('enzo', movimientos));
-    const movCount = movimientos.filter(m => m.persona === p).length;
-
-
-    // Guardias para elementos que pueden no existir
-    const ingEl = document.getElementById('g-ing-' + p);
-    if (ingEl) ingEl.textContent = '$' + ing.toLocaleString('es-AR');
-    const gasEl = document.getElementById('g-gas-' + p);
-    if (gasEl) gasEl.textContent = '$' + gas.toLocaleString('es-AR');
-    const saldoEl = document.getElementById('g-saldo-' + p);
-    if (saldoEl) saldoEl.textContent = '$' + saldo.toLocaleString('es-AR');
-
-    const movCountEl = document.getElementById('g-' + p + '-mov-count');
-    if (movCountEl) movCountEl.textContent = movCount + ' movimiento' + (movCount !== 1 ? 's' : '');
-    if (typeof renderMovPersona === 'function') renderMovPersona(p);
-
-    const ingPanelEl = document.getElementById('g-panel-' + p + '-ing');
-    const gasPanelEl = document.getElementById('g-panel-' + p + '-gas');
-    const salPanelEl = document.getElementById('g-panel-' + p + '-saldo');
-    const movPanelEl = document.getElementById('g-panel-' + p + '-mov');
-    const barEl = document.getElementById('g-barra-' + p);
-    if (ingPanelEl) ingPanelEl.textContent = '$' + ing.toLocaleString('es-AR');
-    if (gasPanelEl) gasPanelEl.textContent = '$' + gas.toLocaleString('es-AR');
-    if (salPanelEl) { salPanelEl.textContent = '$' + saldo.toLocaleString('es-AR'); salPanelEl.style.color = saldo >= 0 ? (p === 'enzo' ? '#58a6ff' : '#bc8cff') : '#f85149'; }
-    if (movPanelEl) movPanelEl.textContent = movCount + ' mov.';
-    if (barEl) {
-      const pct = ing > 0 ? Math.min(100, Math.round((1 - gas/ing)*100)) : 0;
-      barEl.style.width = Math.max(0, pct) + '%';
-      barEl.style.background = pct >= 0 ? 'linear-gradient(90deg,#3fb950,#2ea043)' : 'linear-gradient(90deg,#f85149,#cf222e)';
-    }
-  });
 
   // Saldo a favor vs saldo que debe (consumo de favor vs retiros)
   // Querés que en Adrian/Enzo figure:
@@ -125,16 +68,13 @@ window.renderGestion = function() {
   const cajaEfec  = totalesWC.cajaEfecBruta - totalesWC.descuentosEfec;
   const cajaTrans = totalesWC.cajaTransBruta - totalesWC.descuentosTrans;
   // Ganancia de órdenes — ya registradas en movimientos, no se suman por separado
-  const otGanCobradas  = 0;
-  const otGanPendientes= 0;
-  const otGan          = totalesWC.otGan;
+  const otGan = totalesWC.otGan;
   const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = '$' + val.toLocaleString('es-AR'); };
   set('g-caja-efec', cajaEfec);
   set('g-caja-trans', cajaTrans);
   // Toda la caja del taller pertenece a WindowsCenter y se muestra neta de descuentos.
   const cajaConOT = totalesWC.netoWC;
   if (cajGrande) { cajGrande.textContent = '$' + cajaConOT.toLocaleString('es-AR'); cajGrande.style.color = cajaConOT >= 0 ? 'white' : '#f85149'; }
-  const statCajaOT = document.getElementById('g-stat-caja'); if (statCajaOT) statCajaOT.textContent = '$' + cajaConOT.toLocaleString('es-AR');
   set('g-panel-ing-efec', ingEfec);
   set('g-panel-ing-trans', ingTrans);
   set('g-panel-gas-efec', gasEfec);

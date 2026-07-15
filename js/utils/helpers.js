@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════
-// HELPERS — toast, modales y confirm dialog genéricos
+// HELPERS — toast y confirm dialog genéricos
 // ══════════════════════════════════════════════
 
 // ── TOAST ──
@@ -7,16 +7,6 @@ function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// ── MODAL EMPRESA ──
-function cerrarModal() { document.getElementById('modal-empresa').classList.remove('open'); }
-
-function guardarEmpresa() {
-  document.getElementById('empresa').value     = document.getElementById('m-empresa').value;
-  document.getElementById('empContacto').value = document.getElementById('m-contacto').value;
-  cerrarModal();
-  guardarConfig();
 }
 
 // ── CONFIRM DIALOG (genérico, usado por todos los módulos) ──

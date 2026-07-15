@@ -4,13 +4,9 @@
 // (listeners de Firestore) y se leen desde los módulos de UI/lógica.
 // ══════════════════════════════════════════════
 
-window.pedido            = [];
 window.movimientos       = [];
 window.ordenesTrabajoData = [];
 window.descuentosWC      = [];
-
-// Contador local de número de presupuesto (módulo de pedidos, legacy)
-let nroCounter = 1;
 
 // ── SALDO FAVOR/DEBE DE UNA PERSONA (Adrian / Enzo) ──
 // saldo = (gasto-costo) - (retiro-caja)
