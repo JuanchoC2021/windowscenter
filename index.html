@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>WindowsCenter Pro</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/gestion.css">
+<link rel="stylesheet" href="css/ordenes.css">
+<link rel="stylesheet" href="css/windowscenter.css">
+</head>
+<body>
+
+<!-- SYNC INDICATOR -->
+<div id="sync-indicator" class="syncing">
+  <div class="sync-dot pulse"></div>
+  <span id="sync-text">Conectando…</span>
+</div>
+
+
+
+<!-- GESTIÓN DEL TALLER -->
+<div id="view-gestion">
+
+  <div class="main-head" style="flex-shrink:0;flex-direction:column;align-items:stretch;gap:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <h2>💰 Gestión del Taller</h2>
+      <div class="stats-row">
+        <div class="stat-pill">Mov: <span class="val" id="g-stat-count">0</span></div>
+        <div class="stat-pill" style="background:var(--green-bg);border-color:var(--green);color:var(--green)">Ing: <span class="val" id="g-stat-ing">$0</span></div>
+        <div class="stat-pill" style="background:var(--red-bg);border-color:var(--red);color:var(--red)">Gas: <span class="val" id="g-stat-gas">$0</span></div>
+        <div class="stat-pill" style="background:var(--amber-bg);border-color:var(--amber);color:var(--amber)">💵 Efec: <span class="val" id="g-stat-efec">$0</span></div>
+        <div class="stat-pill" style="background:var(--blue-bg);border-color:var(--blue);color:var(--blue)">🏦 Trans: <span class="val" id="g-stat-trans">$0</span></div>
+      </div>
+    </div>
+    <!-- Tabs principales de Gestión -->
+    <div style="display:flex;gap:4px">
+      <button id="gtab-main-finanzas" onclick="switchGMain('finanzas')" class="btn btn-outline btn-sm" style="font-size:12px;background:var(--ink);color:white;border-color:var(--ink)">📊 Finanzas</button>
+      <button id="gtab-main-ordenes"  onclick="switchGMain('ordenes')"  class="btn btn-outline btn-sm" style="font-size:12px">📦 Órdenes de Trabajo</button>
+      <button id="gtab-main-windowscenter" onclick="switchGMain('windowscenter')" class="btn btn-outline btn-sm" style="font-size:12px;color:#3fb950;border-color:rgba(63,185,80,0.5)">🏢 WindowsCenter</button>
+    </div>
+  </div>
+
+  <div class="main-body" style="padding:20px 24px">
+
+  <!-- ══ PANEL FINANZAS ══ -->
+  <div id="gpanel-finanzas">
+
+    <!-- ══ PANEL PRINCIPAL COMBINADO ══ -->
+    <div style="background:linear-gradient(135deg,#0d1117 0%,#1c2128 100%);border-radius:var(--radius-lg);padding:24px;margin-bottom:20px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(9,105,218,0.08);border-radius:50%"></div>
+      <div style="position:absolute;bottom:-30px;left:30%;width:120px;height:120px;background:rgba(26,127,55,0.06);border-radius:50%"></div>
+
+      <div style="font-size:11px;color:#6e7681;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">WindowsCenter — Caja del taller</div>
+      <div style="font-size:36px;font-weight:700;color:white;letter-spacing:-1px;margin-bottom:4px" id="g-caja-grande">$0</div>
+      <!-- División efectivo / transferencia en caja -->
+      <div style="display:flex;gap:10px;margin-bottom:18px">
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#d29922;background:rgba(210,153,34,0.12);border:1px solid rgba(210,153,34,0.25);border-radius:20px;padding:3px 10px">
+          💵 Efectivo: <span style="font-weight:700;color:#e3b341" id="g-caja-efec">$0</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#58a6ff;background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.25);border-radius:20px;padding:3px 10px">
+          🏦 Transferencia: <span style="font-weight:700;color:#79c0ff" id="g-caja-trans">$0</span>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px">
+        <div style="background:rgba(26,127,55,0.15);border:1px solid rgba(26,127,55,0.3);border-radius:8px;padding:12px">
+          <div style="font-size:10px;color:#3fb950;text-transform:uppercase;font-weight:600;letter-spacing:.08em">↑ Total ingresos</div>
+          <div style="font-size:20px;font-weight:700;color:#3fb950;margin-top:4px" id="g-panel-ing">$0</div>
+          <div style="font-size:10px;color:rgba(63,185,80,0.6);margin-top:2px" id="g-panel-ing-mov">0 movimientos</div>
+          <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+            <span style="font-size:10px;color:#d29922">💵 <span id="g-panel-ing-efec">$0</span></span>
+            <span style="font-size:10px;color:#58a6ff">🏦 <span id="g-panel-ing-trans">$0</span></span>
+          </div>
+        </div>
+        <div style="background:rgba(207,34,46,0.12);border:1px solid rgba(207,34,46,0.25);border-radius:8px;padding:12px">
+          <div style="font-size:10px;color:#f85149;text-transform:uppercase;font-weight:600;letter-spacing:.08em">↓ Total gastos</div>
+          <div style="font-size:20px;font-weight:700;color:#f85149;margin-top:4px" id="g-panel-gas">$0</div>
+          <div style="font-size:10px;color:rgba(248,81,73,0.6);margin-top:2px" id="g-panel-gas-mov">0 movimientos</div>
+          <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+            <span style="font-size:10px;color:#d29922">💵 <span id="g-panel-gas-efec">$0</span></span>
+            <span style="font-size:10px;color:#58a6ff">🏦 <span id="g-panel-gas-trans">$0</span></span>
+          </div>
+        </div>
+        <div style="background:rgba(130,80,223,0.12);border:1px solid rgba(130,80,223,0.25);border-radius:8px;padding:12px">
+          <div style="font-size:10px;color:#bc8cff;text-transform:uppercase;font-weight:600;letter-spacing:.08em">📊 Margen neto</div>
+          <div style="font-size:20px;font-weight:700;color:#bc8cff;margin-top:4px" id="g-panel-margen">—</div>
+          <div style="font-size:10px;color:rgba(188,140,255,0.6);margin-top:2px" id="g-panel-margen-sub">sobre ingresos</div>
+          <div style="font-size:10px;color:rgba(188,140,255,0.5);margin-top:6px">Ganancia órdenes: <span style="color:#bc8cff;font-weight:700" id="g-panel-gan-ordenes">$0</span></div>
+        </div>
+      </div>
+
+      <!-- COSTOS Y RETIROS DE CAJA (UNIFICADO) -->
+      <div style="margin-bottom:18px">
+        <div style="background:rgba(130,80,223,0.12);border:1px solid rgba(130,80,223,0.3);border-radius:8px;padding:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-size:12px;font-weight:700;color:#bc8cff">Gastos de Costos &amp; Retiro de Caja</div>
+            <div style="font-size:10px;color:rgba(188,140,255,0.55)" id="g-panel-costos-retiro-mov">0 mov.</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+            <div>
+              <div style="font-size:9px;color:rgba(63,185,80,0.7);text-transform:uppercase;font-weight:600">↑ Gastos de costos</div>
+              <div style="font-size:14px;font-weight:700;color:#3fb950;margin-top:2px" id="g-panel-costos-gas">$0</div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:rgba(248,81,73,0.7);text-transform:uppercase;font-weight:600">↓ Retiro de caja</div>
+              <div style="font-size:14px;font-weight:700;color:#f85149;margin-top:2px" id="g-panel-retiro-gas">$0</div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:rgba(188,140,255,0.7);text-transform:uppercase;font-weight:600">Saldo neto</div>
+              <div style="font-size:14px;font-weight:700;color:#bc8cff;margin-top:2px" id="g-panel-costos-retiro-saldo">$0</div>
+            </div>
+          </div>
+          <div style="margin-top:10px;height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden">
+            <div style="height:100%;background:linear-gradient(90deg,#3fb950,#2ea043);border-radius:2px;transition:width .4s ease" id="g-barra-costos-retiro"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL WINDOWSCENTER -->
+      <div style="background:linear-gradient(135deg,#0d1f12,#0a1a0e);border:1px solid rgba(63,185,80,0.3);border-radius:10px;padding:16px;margin-bottom:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:32px;height:32px;background:rgba(9,105,218,0.3);border:1px solid rgba(9,105,218,0.5);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#79c0ff">WC</div>
+            <div>
+              <div style="color:white;font-weight:700;font-size:14px">WindowsCenter</div>
+              <div style="color:rgba(255,255,255,0.45);font-size:10px">Empresa — Caja total del taller</div>
+            </div>
+          </div>
+          <button onclick="switchGMain('windowscenter')" class="btn btn-outline btn-sm" style="font-size:11px;color:#3fb950;border-color:rgba(63,185,80,0.4);background:rgba(63,185,80,0.08);padding:5px 12px">Ver descuentos →</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div style="background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.2);border-radius:8px;padding:10px">
+            <div style="font-size:9px;color:rgba(63,185,80,0.7);text-transform:uppercase;font-weight:600;letter-spacing:.08em">📥 Caja taller</div>
+            <div style="font-size:18px;font-weight:700;color:#3fb950;margin-top:3px" id="wc-caja-bruta">$0</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-top:1px">Ingresos − Gastos del taller</div>
+          </div>
+          <div style="background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.2);border-radius:8px;padding:10px">
+            <div style="font-size:9px;color:rgba(248,81,73,0.7);text-transform:uppercase;font-weight:600;letter-spacing:.08em">↓ Descuentos</div>
+            <div style="font-size:18px;font-weight:700;color:#f85149;margin-top:3px" id="wc-total-descuentos">$0</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-top:1px" id="wc-desc-count">0 descuentos</div>
+          </div>
+          <div style="background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.2);border-radius:8px;padding:10px">
+            <div style="font-size:9px;color:rgba(88,166,255,0.7);text-transform:uppercase;font-weight:600;letter-spacing:.08em">💼 Neto WC</div>
+            <div style="font-size:18px;font-weight:700;margin-top:3px;color:#79c0ff" id="wc-neto">$0</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-top:1px">Caja − Descuentos</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra visual ingreso vs gasto -->
+      <div style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:#8b949e;margin-bottom:5px">
+          <span>Ingresos vs Gastos (total taller)</span>
+          <span id="g-barra-pct">—</span>
+        </div>
+        <div style="height:7px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden">
+          <div style="height:100%;background:linear-gradient(90deg,#3fb950,#2ea043);border-radius:4px;transition:width .4s ease" id="g-barra-ing" style="width:0%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;margin-top:4px">
+          <span style="color:#3fb950" id="g-barra-ing-label">$0 ingresado</span>
+          <span style="color:#f85149" id="g-barra-gas-label">$0 gastado</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ FORMULARIO PRINCIPAL ══ -->
+    <div style="background:var(--white);border:1px solid var(--line);border-radius:var(--radius-lg);padding:18px;margin-bottom:20px">
+      <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+        <span>➕ Registrar movimiento</span>
+        <div class="tabs" style="margin:0;flex:1;max-width:240px">
+          <button class="tab active" id="gtab-ingreso" onclick="switchGTab('ingreso')" style="color:var(--green)">↑ Ingreso</button>
+          <button class="tab" id="gtab-gasto" onclick="switchGTab('gasto')" style="">↓ Gasto</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1.4fr 1fr 1fr 1fr auto;gap:10px;align-items:end">
+        <div>
+          <label>Fecha</label>
+          <input type="date" id="g-fecha">
+        </div>
+        <div>
+            <label>Destino</label>
+          <select id="g-persona">
+            <option value="windowscenter">WindowsCenter</option>
+          </select>
+        </div>
+        <div>
+          <label>Categoría</label>
+          <select id="g-categoria"></select>
+        </div>
+        <div>
+          <label>Descripción</label>
+          <input type="text" id="g-desc" placeholder="Ej: Ventana cocina Sr. Pérez">
+        </div>
+        <div>
+          <label>Monto ($)</label>
+          <input type="number" id="g-monto" placeholder="0" min="0" onkeydown="if(event.key==='Enter')addMovimiento()">
+        </div>
+        <div>
+          <label>Medio de pago</label>
+          <select id="g-medio">
+            <option value="efectivo">💵 Efectivo</option>
+            <option value="transferencia">🏦 Transferencia</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm" style="white-space:nowrap;padding:9px 18px;font-size:13px" onclick="addMovimiento()">Registrar</button>
+      </div>
+    </div>
+
+    <!-- ══ SECCIÓN RETIROS DE CAJA / GASTOS - ADRIAN & ENZO ══ -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+
+      <!-- ADRIAN -->
+      <div style="background:var(--white);border:2px solid rgba(188,140,255,0.3);border-radius:var(--radius-lg);padding:18px">
+        <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid rgba(188,140,255,0.2)">👤 Adrian</div>
+
+        <!-- Retiro de Caja -->
+        <div style="margin-bottom:18px">
+          <div style="font-size:12px;font-weight:600;color:#8250df;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">💰 Retiro de Caja</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end">
+            <div>
+              <label style="font-size:11px;color:var(--ink3)">Monto ($)</label>
+              <input type="number" id="adrian-retiro-monto" placeholder="0" min="0" style="padding:8px 10px;font-size:12px;width:100%;border:1px solid var(--line);border-radius:4px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--ink3)">Medio</label>
+              <select id="adrian-retiro-medio" style="padding:8px 10px;font-size:12px;width:100%;border:1px solid var(--line);border-radius:4px">
+                <option value="efectivo">💵 Efectivo</option>
+                <option value="transferencia">🏦 Transferencia</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--ink3)">Descripción</label>
+              <input type="text" id="adrian-retiro-desc" placeholder="Ej: Adelanto" style="padding:8px 10px;font-size:12px;width:100%;border:1px solid var(--line);border-radius:4px">
+            </div>
+            <button class="btn btn-sm" style="background:#8250df;color:white;border-color:#8250df;padding:8px 12px;font-size:11px" onclick="addPersonaTransaccion('adrian', 'retiro-caja')">Registrar</button>
+          </div>
+        </div>
+
+        <!-- Gastos de Costos -->
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#8250df;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">📊 Gastos de Costos</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end">
+            <div>
+              <label style="font-size:11px;color:var(--ink3)">Monto ($)</label>
+              <input type="number" id="adrian-costo-monto" placeholder="0" min="0" style="padding:8px 10px;font-size:12px;width:100%;border:1px solid var(--line);border-radius:4px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--ink3)">Medio</label>
+              <select id="adrian-costo-medio" style="padding:8px 10px;font-size:12px;width:100%;border:1px solid var(--line);border-radius:4px">
+                <option value="efectivo">💵 Efectivo</option>
+                <option value="transferencia">🏦 Transferencia</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--ink3)">Descripción</label>
+              <input type="text" id="adrian-costo-desc" placeholder="Ej: Aluminio, vidrio…" style="padding:8px 10px;font-size:12px;width:100%;border:1px solid var(--line);border-radius:4px">
+            </div>
+            <button class="btn btn-sm" style="background:#8250df;color:white;border-color:#8250df;padding:8px 12px;font-size:11px" onclick="addPersonaTransaccion('adrian', 'gasto-costo')">Registrar</button>
+          </div>
+        </div>
+
+        <!-- Resultado unificado: Retiro + Costos -->
+        <div style="background:rgba(188,140,255,0.08);border:1px solid rgba(188,140,255,0.15);border-radius:6px;padding:10px;margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div>
+            <div style="font-size:9px;color:#8250df;font-weight:600;text-transform:uppercase">Saldo total</div>
+            <div style="font-size:16px;font-weight:700;color:#8250df" id="adrian-total-saldo">$0</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:9px;color:#8250df;font-weight:600;text-transform:uppercase">Cantidad</div>
+            <div style="font-size:14px;font-weight:600;color:#8250df" id="adrian-total-count">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ENZO -->
+      <div style="background:var(--white);border:2px solid rgba(88,166,255,0.3);border-radius:var(--radius-lg);padding:18px">
+        <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid rgba(88,166,255,0.2)">👤 Enzo</div>
+
+        <!-- Retiro de Caja -->
+        <div style="margin-bottom:18px">
+          <div style="font-size:12px;font-weight:600;color:#58a6ff;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">💰 Retiro de Caja</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end">
+            <div>
+              <label style="font-size:11px;color:var(--ink3)">Monto ($)</label>
+              <input type="number" id="enzo-retiro-monto" placeholder="0" min="0" style="padding:8px 10px;font-size:12px;width:100%;border:1px solid var(--line);border-radius:4px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--ink3)">Medio</label>
+              <select id="enzo-retiro-medio" style="padding:8px 10px;font-size:12px;width:100%;border:1px solid var(--line);border-radius:4px">
+                <option value="efectivo">💵 Efectivo</option>
+                <option value="transferencia">🏦 Transferencia</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--ink3)">Descripción</label>
+              <input type="text" id="enzo-retiro-desc" placeholder="Ej: Adelanto" style="padding:8px 10px;font-size:12px;width:100%;border:1px solid var(--line);border-radius:4px">
+            </div>
+            <button class="btn btn-sm" style="background:#58a6ff;color:white;border-color:#58a6ff;padding:8px 12px;font-size:11px" onclick="addPersonaTransaccion('enzo', 'retiro-caja')">Registrar</button>
+          </div>
+        </div>
+
+        <!-- Gastos de Costos -->
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#58a6ff;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">📊 Gastos de Costos</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end">
+            <div>
+              <label style="font-size:11px;color:var(--ink3)">Monto ($)</label>
+              <input type="number" id="enzo-costo-monto" placeholder="0" min="0" style="padding:8px 10px;font-size:12px;width:100%;border:1px solid var(--line);border-radius:4px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--ink3)">Medio</label>
+              <select id="enzo-costo-medio" style="padding:8px 10px;font-size:12px;width:100%;border:1px solid var(--line);border-radius:4px">
+                <option value="efectivo">💵 Efectivo</option>
+                <option value="transferencia">🏦 Transferencia</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--ink3)">Descripción</label>
+              <input type="text" id="enzo-costo-desc" placeholder="Ej: Aluminio, vidrio…" style="padding:8px 10px;font-size:12px;width:100%;border:1px solid var(--line);border-radius:4px">
+            </div>
+            <button class="btn btn-sm" style="background:#58a6ff;color:white;border-color:#58a6ff;padding:8px 12px;font-size:11px" onclick="addPersonaTransaccion('enzo', 'gasto-costo')">Registrar</button>
+          </div>
+        </div>
+
+        <!-- Resultado unificado: Retiro + Costos -->
+        <div style="background:rgba(88,166,255,0.08);border:1px solid rgba(88,166,255,0.15);border-radius:6px;padding:10px;margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div>
+            <div style="font-size:9px;color:#58a6ff;font-weight:600;text-transform:uppercase">Saldo total</div>
+            <div style="font-size:16px;font-weight:700;color:#58a6ff" id="enzo-total-saldo">$0</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:9px;color:#58a6ff;font-weight:600;text-transform:uppercase">Cantidad</div>
+            <div style="font-size:14px;font-weight:600;color:#58a6ff" id="enzo-total-count">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ HISTORIAL COMPLETO ══ -->
+    <div class="table-card">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px">
+        <!-- Fila 1: título + botones acción -->
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-size:13px;font-weight:600;flex:1">📋 Historial completo</span>
+          <button class="btn btn-outline btn-sm" onclick="exportarExcel()" style="color:var(--green);border-color:var(--green);font-size:11px;gap:4px">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 1.5a.25.25 0 0 0-.25.25v11.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 8 4.25V1.5Zm5.5.75v2a.25.25 0 0 0 .25.25h2Z"/><path d="M2 1.75C2 .784 2.784 0 3.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 12.25 15h-8.5A1.75 1.75 0 0 1 2 13.25Z"/></svg>
+            Exportar Excel
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="limpiarGestion()" style="color:var(--red);border-color:var(--red);font-size:11px">🗑 Limpiar todo</button>
+        </div>
+        <!-- Fila 2: filtros -->
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <!-- Presets de período -->
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            <button id="gp-hoy"   onclick="setPeriodo('hoy')"   class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 9px">Hoy</button>
+            <button id="gp-semana" onclick="setPeriodo('semana')" class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 9px">Esta semana</button>
+            <button id="gp-mes"   onclick="setPeriodo('mes')"   class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 9px;background:var(--ink);color:white;border-color:var(--ink)">Este mes</button>
+            <button id="gp-todo"  onclick="setPeriodo('todo')"  class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 9px">Todo</button>
+            <button id="gp-custom" onclick="setPeriodo('custom')" class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 9px">Personalizado</button>
+          </div>
+          <!-- Rango personalizado (oculto por defecto) -->
+          <div id="g-rango-custom" style="display:none;align-items:center;gap:6px;flex-wrap:wrap">
+            <input type="date" id="g-fecha-desde" onchange="renderGestion()" style="padding:4px 8px;border:1px solid var(--line2);border-radius:6px;font-size:12px;width:140px">
+            <span style="font-size:12px;color:var(--ink3)">→</span>
+            <input type="date" id="g-fecha-hasta" onchange="renderGestion()" style="padding:4px 8px;border:1px solid var(--line2);border-radius:6px;font-size:12px;width:140px">
+          </div>
+          <!-- Separador -->
+          <div style="width:1px;height:22px;background:var(--line2);margin:0 2px"></div>
+          <select id="g-filtro-persona" onchange="renderGestion()" style="padding:5px 8px;border:1px solid var(--line2);border-radius:6px;font-size:12px;background:var(--surface);color:var(--ink)">
+            <option value="todos">Todos</option>
+            <option value="windowscenter">WindowsCenter</option>
+          </select>
+          <select id="g-filtro-tipo" onchange="renderGestion()" style="padding:5px 8px;border:1px solid var(--line2);border-radius:6px;font-size:12px;background:var(--surface);color:var(--ink)">
+            <option value="todos">Ingresos y Gastos</option>
+            <option value="ingreso">Solo Ingresos</option>
+            <option value="gasto">Solo Gastos</option>
+          </select>
+          <!-- Badge resultado del filtro -->
+          <span id="g-filtro-count" style="font-size:11px;color:var(--ink3);white-space:nowrap"></span>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha / Hora</th>
+              <th>Tipo</th>
+              <th>Destino</th>
+              <th>Categoría</th>
+              <th>Descripción</th>
+              <th>Medio</th>
+              <th style="text-align:right">Monto</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="g-historial-body">
+            <tr><td colspan="7"><div class="empty-state" style="padding:40px"><div class="empty-icon">💸</div><h3>Sin movimientos registrados</h3><p>Registrá ingresos y gastos del taller.</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /gpanel-finanzas -->
+
+  <!-- ══ PANEL ÓRDENES DE TRABAJO ══ -->
+  <div id="gpanel-ordenes" style="display:none">
+
+    <!-- Formulario nueva orden -->
+    <div style="background:var(--white);border:1px solid var(--line);border-radius:var(--radius-lg);padding:18px;margin-bottom:20px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:14px">📦 Nueva Orden de Trabajo</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <label>Fecha de registro</label>
+          <input type="date" id="ot-fecha-registro">
+        </div>
+        <div>
+          <label>Cliente</label>
+          <input type="text" id="ot-cliente" placeholder="Nombre del cliente">
+        </div>
+        <div>
+          <label>Descripción del trabajo</label>
+          <input type="text" id="ot-desc" placeholder="Ej: 3 ventanas dormitorio">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:10px">
+        <div>
+            <label>Destino / responsable</label>
+          <select id="ot-persona">
+            <option value="windowscenter">WindowsCenter</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <label>Precio de venta ($)</label>
+          <input type="number" id="ot-venta" placeholder="0" min="0">
+        </div>
+        <div>
+          <label>Seña recibida ($)</label>
+          <input type="number" id="ot-sena" placeholder="0" min="0" value="0">
+        </div>
+        <div>
+          <label>Medio de seña</label>
+          <select id="ot-sena-medio">
+            <option value="efectivo">💵 Efectivo</option>
+            <option value="transferencia">🏦 Transferencia</option>
+          </select>
+        </div>
+        <div>
+          <label>Medio de saldo</label>
+          <select id="ot-saldo-medio">
+            <option value="efectivo">💵 Efectivo</option>
+            <option value="transferencia">🏦 Transferencia</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div>
+          <label>Fecha estimada de entrega</label>
+          <input type="text" id="ot-fecha-entrega" placeholder="Ej: 20/06/2025">
+        </div>
+        <div>
+          <label>Estado</label>
+          <select id="ot-estado">
+            <option value="pendiente">⏳ Pendiente</option>
+            <option value="senal">💰 Con seña</option>
+            <option value="cobrado">✅ Cobrado</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Costos de la orden -->
+      <div style="border-top:1px solid var(--line);padding-top:14px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:10px">📋 Costos del trabajo</div>
+        <div id="ot-costos-lista" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px"></div>
+        <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr auto;gap:8px;align-items:end">
+          <div>
+            <label>Concepto</label>
+            <input type="text" id="ot-costo-desc" placeholder="Ej: Aluminio, vidrio, combustible…">
+          </div>
+          <div>
+            <label>Monto ($)</label>
+            <input type="number" id="ot-costo-monto" placeholder="0" min="0">
+          </div>
+          <div>
+            <label>Origen del pago</label>
+            <select id="ot-costo-origen">
+              <option value="windowscenter">WindowsCenter</option>
+              <option value="adrian">Adrian (Retiro)</option>
+              <option value="enzo">Enzo (Costos)</option>
+            </select>
+          </div>
+          <div>
+            <label>Medio de pago</label>
+            <select id="ot-costo-medio">
+              <option value="efectivo">💵 Efectivo</option>
+              <option value="transferencia">🏦 Transferencia</option>
+            </select>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="agregarCostoOT()" style="color:var(--blue);border-color:var(--blue)">+ Agregar</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="guardarOrdenTrabajo()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a.75.75 0 0 1 .75.75v4.5h4.5a.75.75 0 0 1 0 1.5h-4.5v4.5a.75.75 0 0 1-1.5 0v-4.5h-4.5a.75.75 0 0 1 0-1.5h4.5v-4.5A.75.75 0 0 1 8 2Z"/></svg>
+        Guardar Orden de Trabajo
+      </button>
+    </div>
+
+    <!-- Lista de órdenes -->
+    <div id="ot-lista" style="display:flex;flex-direction:column;gap:12px">
+      <div class="empty-state" style="background:var(--white);border:1px solid var(--line);border-radius:var(--radius-lg);padding:60px">
+        <div class="empty-icon">📦</div>
+        <h3>Sin órdenes de trabajo</h3>
+        <p>Cargá tu primera orden arriba para ver el detalle de ganancias.</p>
+      </div>
+    </div>
+
+  </div><!-- /gpanel-ordenes -->
+
+  <!-- ══ PANEL WINDOWSCENTER ══ -->
+  <div id="gpanel-windowscenter" style="display:none">
+
+    <!-- Header empresa -->
+    <div style="background:linear-gradient(135deg,#0d1117 0%,#1c2128 100%);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-30px;right:-30px;width:140px;height:140px;background:rgba(63,185,80,0.06);border-radius:50%"></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <div style="width:42px;height:42px;background:rgba(9,105,218,0.25);border:1.5px solid rgba(9,105,218,0.5);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#79c0ff;flex-shrink:0">WC</div>
+        <div>
+          <div style="color:white;font-weight:700;font-size:16px">WindowsCenter</div>
+          <div style="color:rgba(255,255,255,0.4);font-size:11px">Empresa — Resumen de caja y descuentos</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div style="background:rgba(63,185,80,0.12);border:1px solid rgba(63,185,80,0.25);border-radius:8px;padding:12px">
+          <div style="font-size:10px;color:#3fb950;text-transform:uppercase;font-weight:600;letter-spacing:.08em">📥 Caja bruta del taller</div>
+          <div style="font-size:22px;font-weight:700;color:#3fb950;margin-top:4px" id="wc-detail-caja">$0</div>
+          <div style="font-size:10px;color:rgba(63,185,80,0.5);margin-top:2px">Todos los ingresos − gastos</div>
+        </div>
+        <div style="background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.2);border-radius:8px;padding:12px">
+          <div style="font-size:10px;color:#f85149;text-transform:uppercase;font-weight:600;letter-spacing:.08em">↓ Total descontado</div>
+          <div style="font-size:22px;font-weight:700;color:#f85149;margin-top:4px" id="wc-detail-descuentos">$0</div>
+          <div style="font-size:10px;color:rgba(248,81,73,0.5);margin-top:2px" id="wc-detail-desc-count">0 descuentos registrados</div>
+        </div>
+        <div style="background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.25);border-radius:8px;padding:12px">
+          <div style="font-size:10px;color:#79c0ff;text-transform:uppercase;font-weight:600;letter-spacing:.08em">💼 Saldo neto WC</div>
+          <div style="font-size:22px;font-weight:700;margin-top:4px" id="wc-detail-neto">$0</div>
+          <div style="font-size:10px;color:rgba(88,166,255,0.4);margin-top:2px">Caja − Descuentos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario nuevo descuento -->
+    <div style="background:var(--white);border:1px solid var(--line);border-radius:var(--radius-lg);padding:18px;margin-bottom:20px">
+      <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+        <span>➖ Registrar descuento a WindowsCenter</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1.5fr 1fr 1fr 1fr auto;gap:10px;align-items:end">
+        <div>
+          <label>Tipo de descuento</label>
+          <select id="wc-tipo">
+            <option value="gasto-empresa">🔧 Gasto empresa</option>
+            <option value="otro">📋 Otro</option>
+          </select>
+        </div>
+        <div>
+          <label>Descripción</label>
+          <input type="text" id="wc-desc" placeholder="Ej: Sueldo mayo, retiro en efectivo…">
+        </div>
+        <div>
+          <label>Monto ($)</label>
+          <input type="number" id="wc-monto" placeholder="0" min="0" onkeydown="if(event.key==='Enter')addDescuentoWC()">
+        </div>
+        <div>
+          <label>Medio de pago</label>
+          <select id="wc-medio">
+            <option value="efectivo">💵 Efectivo</option>
+            <option value="transferencia">🏦 Transferencia</option>
+          </select>
+        </div>
+        <div>
+          <label>Fecha</label>
+          <input type="text" id="wc-fecha-input" placeholder="dd/mm/aaaa" style="font-size:12px">
+        </div>
+        <button class="btn btn-primary btn-sm" style="white-space:nowrap;padding:9px 18px;font-size:13px;background:#cf222e;border-color:#cf222e" onclick="addDescuentoWC()">Registrar</button>
+      </div>
+    </div>
+
+    <!-- Historial de descuentos -->
+    <div class="table-card">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:13px;font-weight:600;flex:1">📋 Historial de descuentos a WindowsCenter</span>
+        <button class="btn btn-outline btn-sm" onclick="limpiarDescuentosWC()" style="color:var(--red);border-color:var(--red);font-size:11px">🗑 Limpiar todo</button>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Descripción</th>
+              <th>Medio</th>
+              <th style="text-align:right">Monto</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="wc-historial-body">
+            <tr><td colspan="6"><div class="empty-state" style="padding:40px"><div class="empty-icon">🏢</div><h3>Sin descuentos registrados</h3><p>Registrá sueldos, retiros o saldos a favor para descontarlos de la caja de WindowsCenter.</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /gpanel-windowscenter -->
+
+  </div><!-- /main-body -->
+</div><!-- /view-gestion -->
+
+<!-- MODAL EDITAR ORDEN -->
+<div class="modal-backdrop" id="modal-editar-ot">
+  <div class="modal" style="width:600px;max-width:96vw;max-height:90vh;overflow-y:auto">
+    <h3>✏️ Editar Orden de Trabajo</h3>
+    <input type="hidden" id="eot-id">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div><label>Cliente</label><input type="text" id="eot-cliente"></div>
+      <div><label>Descripción</label><input type="text" id="eot-desc"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+      <div><label>Destino / responsable</label>
+        <select id="eot-persona">
+            <option value="windowscenter">WindowsCenter</option>
+        </select>
+      </div>
+      <div><label>Estado</label>
+        <select id="eot-estado">
+          <option value="pendiente">⏳ Pendiente</option>
+          <option value="senal">💰 Con seña</option>
+          <option value="cobrado">✅ Cobrado</option>
+        </select>
+      </div>
+      <div><label>Fecha entrega</label><input type="text" id="eot-fecha-entrega"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+      <div><label>Precio venta ($)</label><input type="number" id="eot-venta" min="0"></div>
+      <div><label>Seña ($)</label><input type="number" id="eot-sena" min="0"></div>
+      <div><label>Medio seña</label>
+        <select id="eot-sena-medio">
+          <option value="efectivo">💵 Efectivo</option>
+          <option value="transferencia">🏦 Transferencia</option>
+        </select>
+      </div>
+      <div><label>Medio saldo</label>
+        <select id="eot-saldo-medio">
+          <option value="efectivo">💵 Efectivo</option>
+          <option value="transferencia">🏦 Transferencia</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="cerrarModalEditarOT()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="guardarEdicionOT()">💾 Guardar cambios</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- MODAL empresa -->
+<div class="modal-backdrop" id="modal-empresa">
+  <div class="modal">
+    <h3>Datos de la empresa</h3>
+    <label>Razón Social</label>
+    <input type="text" id="m-empresa" style="margin-bottom:10px">
+    <label>Teléfono / Email</label>
+    <input type="text" id="m-contacto">
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="guardarEmpresa()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL editar abertura -->
+<div class="modal-backdrop" id="modal-editar">
+  <div class="modal">
+    <h3>✏️ Editar abertura</h3>
+    <input type="hidden" id="edit-id">
+    <label>Descripción</label>
+    <input type="text" id="edit-descripcion" style="margin-bottom:10px">
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <div style="flex:1">
+        <label>Línea</label>
+        <select id="edit-linea">
+          <option value="modena">Módena (corrediza 45°)</option>
+          <option value="herrero">Herrero (proyectante 90°)</option>
+          <option value="a30">A30 New (corrediza 45°)</option>
+          <option value="vitrum">Vitrum (fijo 45°)</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <div style="flex:1"><label>Ancho (cm)</label><input type="number" id="edit-ancho" min="10" max="600"></div>
+      <div style="flex:1"><label>Alto (cm)</label><input type="number" id="edit-alto" min="10" max="600"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <div style="flex:1"><label>Cantidad</label><input type="number" id="edit-cantidad" min="1" max="99"></div>
+      <div style="flex:1">
+        <label>Tipo de Vidrio</label>
+        <select id="edit-vidrio">
+          <option value="1,Float 4mm">Float 4mm</option>
+          <option value="1.5,Reflectivo 6mm">Reflectivo 6mm</option>
+          <option value="2.8,DVH 4+9+4">DVH 4+9+4</option>
+          <option value="3.5,DVH 6+9+6">DVH 6+9+6</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="cerrarModalEditar()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="guardarEdicion()">💾 Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG genérico -->
+<div class="confirm-backdrop" id="confirm-dialog">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirm-icon">⚠️</div>
+    <h4 id="confirm-title">¿Estás seguro?</h4>
+    <p id="confirm-msg">Esta acción no se puede deshacer.</p>
+    <div class="confirm-actions">
+      <button class="btn btn-outline" onclick="cerrarConfirm()">Cancelar</button>
+      <button class="btn" id="confirm-ok-btn" onclick="ejecutarConfirm()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     FIREBASE SDK (módulo ES) — init, refs y listeners realtime
+══════════════════════════════════════════════ -->
+<script type="module" src="js/services/firebase.js"></script>
+
+<!-- ══════════════════════════════════════════════
+     LÓGICA PRINCIPAL (accede a Firebase via window._fb)
+     Orden de carga: store -> utils -> modules -> ui -> app
+══════════════════════════════════════════════ -->
+<script src="js/store.js"></script>
+
+<script src="js/utils/helpers.js"></script>
+<script src="js/utils/fechas.js"></script>
+<script src="js/utils/excel.js"></script>
+<script src="js/utils/pdf.js"></script>
+
+<script src="js/modules/pedidos.js"></script>
+<script src="js/modules/gestion.js"></script>
+<script src="js/modules/ordenes.js"></script>
+<script src="js/modules/windowscenter.js"></script>
+
+<script src="js/ui/renderFinanzas.js"></script>
+<script src="js/ui/renderOrdenes.js"></script>
+<script src="js/ui/renderWc.js"></script>
+
+<script src="js/app.js"></script>
+</body>
+</html>

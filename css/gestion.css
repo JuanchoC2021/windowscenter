@@ -1,0 +1,14 @@
+/* ── GESTIÓN DEL TALLER — Stats pills (header) ── */
+.stat-pill {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 20px;
+  font-size: 12px; font-weight: 500; background: var(--surface);
+  border: 1px solid var(--line); color: var(--ink2);
+}
+.stat-pill .val { color: var(--ink); font-weight: 600; }
+
+/* ── GESTIÓN — Fila de totales en tabla de historial ── */
+.total-row { background: var(--ink); }
+.total-row td { border: none; padding: 14px 14px; color: white; }
+.total-label { font-size: 12px; color: #8b949e; margin-bottom: 2px; }
+.total-val { font-size: 18px; font-weight: 600; }

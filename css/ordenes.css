@@ -1,0 +1,37 @@
+/* ── ORDEN DE TRABAJO ── */
+.orden-card {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: var(--radius-lg); overflow: hidden;
+  transition: box-shadow 0.15s;
+}
+.orden-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+.orden-header {
+  padding: 14px 18px; display: flex; align-items: center;
+  justify-content: space-between; cursor: pointer; user-select: none;
+  border-bottom: 1px solid transparent; transition: border-color 0.15s;
+}
+.orden-header.open { border-bottom-color: var(--line); }
+.orden-body { display: none; padding: 16px 18px; }
+.orden-body.open { display: block; }
+.orden-estado {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+}
+.estado-pendiente  { background: var(--amber-bg); color: var(--amber); }
+.estado-senal      { background: var(--blue-bg);  color: var(--blue);  }
+.estado-cobrado    { background: var(--green-bg); color: var(--green); }
+.costo-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.costo-row:last-child { border-bottom: none; }
+.pago-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600;
+}
+.pago-efectivo    { background: var(--amber-bg); color: var(--amber); }
+.pago-transferencia { background: var(--blue-bg); color: var(--blue); }
+.ganancia-box {
+  background: linear-gradient(135deg,#0d2818,#0a1f12);
+  border: 1px solid rgba(63,185,80,0.25);
+  border-radius: var(--radius); padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 12px;
+}
