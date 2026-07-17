@@ -12,7 +12,7 @@ function getTotalesWindowsCenter() {
   const movimientos = window.movimientos || [];
   const ordenes = window.ordenesTrabajoData || [];
   const descuentos = window.descuentosWC || [];
-  const montoGlobal = m => m.esAmbos ? (m.montoOriginal || 0) : m.monto;
+  const montoGlobal = m => m.esAmbos ? (m.montoOriginal || 0) : (m.monto || 0);
   const movsVis = movimientos.filter(m => !m.esAmbos || m.montoOriginal > 0);
   const calcMedio = (tipo, medio) => movsVis.filter(m => m.tipo === tipo && m.medio === medio).reduce((s,m) => s + montoGlobal(m), 0);
 
@@ -118,14 +118,14 @@ async function addDescuentoWC() {
   try {
     window._fb.setSyncStatus('syncing','Guardando…');
     const { setDoc, doc, db } = window._fb;
-    const id = Date.now().toString();
+    const id = crypto.randomUUID();
     await setDoc(doc(db,'descuentosWC',id), { id, fecha, tipo, desc, monto, medio });
     window._fb.setSyncStatus('synced','Sincronizado ✓');
     document.getElementById('wc-desc').value = '';
     document.getElementById('wc-monto').value = '';
     document.getElementById('wc-fecha-input').value = '';
     showToast('✓ Descuento registrado a WindowsCenter');
-  } catch(e) { showToast('❌ Error: '+e.message); }
+  } catch(e) { window._fb.setSyncStatus('error', 'Error'); showToast('❌ Error: '+e.message); }
 }
 
 async function borrarDescuentoWC(id) {
@@ -135,7 +135,7 @@ async function borrarDescuentoWC(id) {
     await deleteDoc(doc(db,'descuentosWC',id.toString()));
     window._fb.setSyncStatus('synced','Sincronizado ✓');
     showToast('✓ Descuento eliminado');
-  } catch(e) { showToast('❌ Error: '+e.message); }
+  } catch(e) { window._fb.setSyncStatus('error', 'Error'); showToast('❌ Error: '+e.message); }
 }
 
 function confirmarBorrarDescuentoWC(id) {
@@ -167,7 +167,7 @@ async function limpiarDescuentosWC() {
         for (const b of chunks) await b.commit();
         window._fb.setSyncStatus('synced','Sincronizado ✓');
         showToast('✓ Descuentos eliminados');
-      } catch(e) { showToast('❌ Error: '+e.message); }
+      } catch(e) { window._fb.setSyncStatus('error', 'Error'); showToast('❌ Error: '+e.message); }
     }
   });
 }

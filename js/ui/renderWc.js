@@ -44,9 +44,8 @@ window.renderDescuentosWC = function() {
       <td><span class="badge" style="background:var(--red-bg);color:var(--red);border:1px solid rgba(207,34,46,0.2)">${tipoLabel}</span></td>
       <td style="font-weight:500">${d.desc}</td>
       <td>${medioLabel}</td>
-      <td style="text-align:right;font-weight:700;color:var(--red)">−$${d.monto.toLocaleString('es-AR')}</td>
+      <td style="text-align:right;font-weight:700;color:var(--red)">−$${(d.monto || 0).toLocaleString('es-AR')}</td>
       <td><button class="action-btn" onclick="confirmarBorrarDescuentoWC('${d.id}')" title="Eliminar"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M11 1.75V3h2.25a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75ZM4.496 6.675l.66 6.6a.25.25 0 0 0 .249.225h5.19a.25.25 0 0 0 .249-.225l.66-6.6a.75.75 0 0 1 1.492.149l-.66 6.6A1.748 1.748 0 0 1 10.595 15h-5.19a1.75 1.75 0 0 1-1.741-1.575l-.66-6.6a.75.75 0 1 1 1.492-.15Z"/></svg></button></td>
     </tr>`;
   }).join('');
 };
-window.renderDescuentosWC = window.renderDescuentosWC;

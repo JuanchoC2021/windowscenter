@@ -19,7 +19,7 @@ function exportarExcel() {
 
   if (datos.length === 0) { showToast('⚠️ No hay datos con el filtro actual'); return; }
 
-  const empresa = document.getElementById('empresa') ? document.getElementById('empresa').value : 'WindowsCenter';
+  const empresa = 'WindowsCenter';
 
   // Hoja principal — historial
   const filas = datos.map(m => {

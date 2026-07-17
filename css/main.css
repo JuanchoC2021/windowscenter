@@ -200,7 +200,7 @@ tr:hover td { background: var(--surface); }
   .sidebar { width: 100%; height: auto; }
   .main { height: auto; overflow: visible; }
   .main-body { overflow: visible; }
-  #sync-indicator { top: auto; bottom: 72px; right: 12px; }
+  #sync-indicator { bottom: 72px; right: 12px; }
 }
 
 /* ── MOBILE TOUCH ── */
@@ -303,16 +303,66 @@ tr:hover td { background: var(--surface); }
     gap: 10px;
   }
 
+  .main-head > div:first-child {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .main-head h2 {
+    font-size: 16px;
+  }
+
+  .main-head > div:first-child > div:last-child {
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+  }
+
+  /* Search bar full width on mobile */
+  #global-search {
+    width: 100% !important;
+    min-width: 0;
+    flex: 1;
+    font-size: 14px !important;
+    padding: 10px 12px 10px 32px !important;
+  }
+
+  /* Header icons row */
+  .main-head .user-badge {
+    font-size: 11px;
+  }
+
+  .main-head .signout-btn {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  #theme-toggle, #settings-toggle {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
   .main-body {
     padding: 14px 16px;
   }
 
-  /* Sync indicator más chico (definición base en windowscenter.css) */
+  /* Sync indicator más chico */
   #sync-indicator {
     font-size: 10px;
     padding: 4px 8px;
-    bottom: auto;
-    top: 8px;
+    bottom: 72px;
     right: 8px;
   }
 }
+
+/* ── THEME TOGGLE ── */
+#theme-toggle {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: transparent; border: 1px solid var(--line);
+  color: var(--ink3); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; padding: 0; flex-shrink: 0;
+}
+#theme-toggle:hover { background: var(--surface); color: var(--ink); }

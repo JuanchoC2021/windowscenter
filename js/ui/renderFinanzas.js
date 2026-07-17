@@ -1,6 +1,7 @@
 // ══════════════════════════════════════════════
 // RENDER — Panel de Finanzas / Gestión del Taller
 // ══════════════════════════════════════════════
+var _escHtml = function(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); };
 
 window.renderGestion = function() {
   const movimientos = window.movimientos || [];
@@ -12,11 +13,12 @@ window.renderGestion = function() {
 
   // saldo a favor = acumulado de gasto-costo - acumulado de retiros
   // (ambos se registran como tipo="gasto")
-  const adrianFavorCostos = (movimientos.filter(m => m.persona === 'adrian' && m.tipo === 'gasto' && m.categoria === 'gasto-costo') || []).reduce((s,m) => s + (m.esAmbos ? (m.montoOriginal || 0) : (m.monto || 0)), 0);
-  const adrianRetiroCaja  = (movimientos.filter(m => m.persona === 'adrian' && m.tipo === 'gasto' && m.categoria === 'retiro-caja') || []).reduce((s,m) => s + (m.esAmbos ? (m.montoOriginal || 0) : (m.monto || 0)), 0);
+  // FIX: usar m.monto cuando filtramos por persona específica, no m.montoOriginal
+  const adrianFavorCostos = movimientos.filter(m => m.persona === 'adrian' && m.tipo === 'gasto' && m.categoria === 'gasto-costo').reduce((s,m) => s + (m.monto || 0), 0);
+  const adrianRetiroCaja  = movimientos.filter(m => m.persona === 'adrian' && m.tipo === 'gasto' && m.categoria === 'retiro-caja').reduce((s,m) => s + (m.monto || 0), 0);
   const adrianSaldoNeto   = adrianFavorCostos - adrianRetiroCaja; // + = a favor, - = debe
-  const adrianFavorCount  = movimientos.filter(m => m.persona === 'adrian' && m.tipo === 'gasto' && m.categoria === 'gasto-costo' && (!m.esAmbos || m.montoOriginal > 0)).length;
-  const adrianRetiroCount = movimientos.filter(m => m.persona === 'adrian' && m.tipo === 'gasto' && m.categoria === 'retiro-caja' && (!m.esAmbos || m.montoOriginal > 0)).length;
+  const adrianFavorCount  = movimientos.filter(m => m.persona === 'adrian' && m.tipo === 'gasto' && m.categoria === 'gasto-costo').length;
+  const adrianRetiroCount = movimientos.filter(m => m.persona === 'adrian' && m.tipo === 'gasto' && m.categoria === 'retiro-caja').length;
 
   const elAdrianTotalSaldo = document.getElementById('adrian-total-saldo');
   const elAdrianTotalCount = document.getElementById('adrian-total-count');
@@ -34,11 +36,11 @@ window.renderGestion = function() {
   if (elAdrianTotalCount) elAdrianTotalCount.textContent = (adrianRetiroCount + adrianFavorCount);
 
 
-  const enzoFavorCostos = (movimientos.filter(m => m.persona === 'enzo' && m.tipo === 'gasto' && m.categoria === 'gasto-costo') || []).reduce((s,m) => s + (m.esAmbos ? (m.montoOriginal || 0) : (m.monto || 0)), 0);
-  const enzoRetiroCaja  = (movimientos.filter(m => m.persona === 'enzo' && m.tipo === 'gasto' && m.categoria === 'retiro-caja') || []).reduce((s,m) => s + (m.esAmbos ? (m.montoOriginal || 0) : (m.monto || 0)), 0);
+  const enzoFavorCostos = movimientos.filter(m => m.persona === 'enzo' && m.tipo === 'gasto' && m.categoria === 'gasto-costo').reduce((s,m) => s + (m.monto || 0), 0);
+  const enzoRetiroCaja  = movimientos.filter(m => m.persona === 'enzo' && m.tipo === 'gasto' && m.categoria === 'retiro-caja').reduce((s,m) => s + (m.monto || 0), 0);
   const enzoSaldoNeto   = enzoFavorCostos - enzoRetiroCaja; // + = a favor, - = debe
-  const enzoFavorCount  = movimientos.filter(m => m.persona === 'enzo' && m.tipo === 'gasto' && m.categoria === 'gasto-costo' && (!m.esAmbos || m.montoOriginal > 0)).length;
-  const enzoRetiroCount = movimientos.filter(m => m.persona === 'enzo' && m.tipo === 'gasto' && m.categoria === 'retiro-caja' && (!m.esAmbos || m.montoOriginal > 0)).length;
+  const enzoFavorCount  = movimientos.filter(m => m.persona === 'enzo' && m.tipo === 'gasto' && m.categoria === 'gasto-costo').length;
+  const enzoRetiroCount = movimientos.filter(m => m.persona === 'enzo' && m.tipo === 'gasto' && m.categoria === 'retiro-caja').length;
 
   const elEnzoTotalSaldo = document.getElementById('enzo-total-saldo');
   const elEnzoTotalCount = document.getElementById('enzo-total-count');
@@ -50,7 +52,7 @@ window.renderGestion = function() {
   if (elEnzoTotalCount) elEnzoTotalCount.textContent = (enzoRetiroCount + enzoFavorCount);
 
 
-  const montoGlobal = m => m.esAmbos ? (m.montoOriginal || 0) : m.monto;
+  const montoGlobal = m => m.esAmbos ? (m.montoOriginal || 0) : (m.monto || 0);
   const totalesWC = getTotalesWindowsCenter();
   const totalIng = totalesWC.totalIng;
   const totalGas = totalesWC.totalGas;
@@ -128,9 +130,8 @@ window.renderGestion = function() {
 
   // ── Construir filas de órdenes para el historial ──
   const estadoBadgeOT = (estado) => {
-    if (estado === 'cobrado') return `<span class="badge badge-green">✅ Cobrado</span>`;
-    if (estado === 'senal')   return `<span class="badge badge-blue">💰 Con seña</span>`;
-    return `<span class="badge badge-amber">⏳ Pendiente</span>`;
+    const est = getEstadoOT ? getEstadoOT(estado) : { label: '⏳ Pendiente', color: '#d29922', bg: 'rgba(210,153,34,0.12)', border: 'rgba(210,153,34,0.3)' };
+    return `<span class="badge" style="background:${est.bg};color:${est.color};border:1px solid ${est.border}">${est.label}</span>`;
   };
   const personaLabelOT = (p) => {
     return labelPersonaGestion(p === 'ambos' ? 'windowscenter' : p, false, true);
@@ -141,7 +142,7 @@ window.renderGestion = function() {
   const filasOT = ordenes.map(o => ({
     _esOT: true,
     id:        o.id,
-    fecha:     o.fechaEntrega || '—',
+    fecha:     fmtFechaCorta ? fmtFechaCorta(o.fechaEntrega || '') : (o.fechaEntrega || '—'),
     tipo:      'ingreso',
     persona:   o.persona || 'windowscenter',
     categoria: 'orden-trabajo',
@@ -202,27 +203,27 @@ window.renderGestion = function() {
         <td>${estadoBadgeOT(m.estado)}</td>
         <td style="font-weight:600">${personaLabelOT(m.persona)}</td>
         <td><span class="badge" style="background:var(--purple-bg);color:var(--purple);border:1px solid rgba(130,80,223,0.2)">📦 Orden de trabajo</span></td>
-        <td><span style="font-weight:500">${m.cliente}</span> <span style="color:var(--ink3);font-size:12px">— ${m.desc.replace('📦 OT: ' + m.cliente + ' — ','')}</span></td>
+        <td><span style="font-weight:500">${_escHtml(m.cliente)}</span> <span style="color:var(--ink3);font-size:12px">— ${_escHtml(m.desc.replace('📦 OT: ' + m.cliente + ' — ',''))}</span></td>
         <td><span style="font-size:11px;color:var(--ink3)">Ganancia neta</span></td>
         <td style="text-align:right;font-weight:700;color:${ganColor}">
           ${m.ganancia >= 0 ? '+' : '−'}$${Math.abs(m.ganancia).toLocaleString('es-AR')}
-          <div style="font-size:10px;color:var(--ink3);font-weight:400;margin-top:1px">${m.estado === 'cobrado' ? 'cobrado' : m.estado === 'senal' ? 'con seña' : 'pendiente'}</div>
+          <div style="font-size:10px;color:var(--ink3);font-weight:400;margin-top:1px">${m.estado === 'cobrado' ? 'cobrado' : m.estado === 'entregada' ? 'entregada' : m.estado === 'en-proceso' ? 'en proceso' : m.estado === 'crear' ? 'por crear' : 'pendiente'}</div>
         </td>
         <td></td>
       </tr>`;
     }
     const esIngreso  = m.tipo === 'ingreso';
-    const catLabel   = esIngreso ? CATEGORIAS_INGRESO[m.categoria] : CATEGORIAS_GASTO[m.categoria];
+    const catLabel   = esIngreso ? (CATEGORIAS_INGRESO[m.categoria] || 'Otro') : (CATEGORIAS_GASTO[m.categoria] || 'Otro');
     const esFiltPers = filtroPersona !== 'todos';
     const personaLabel   = labelPersonaGestion(m.persona, m.esAmbos && !esFiltPers, true);
-    const montoMostrar   = (m.esAmbos && !esFiltPers) ? m.montoOriginal : m.monto;
-    const subLabel       = (m.esAmbos && !esFiltPers) ? `<div style="font-size:10px;color:var(--ink3);margin-top:1px">$${m.monto.toLocaleString('es-AR')} c/u</div>` : '';
+    const montoMostrar   = ((m.esAmbos && !esFiltPers) ? m.montoOriginal : m.monto) || 0;
+    const subLabel       = (m.esAmbos && !esFiltPers) ? `<div style="font-size:10px;color:var(--ink3);margin-top:1px">$${(m.monto || 0).toLocaleString('es-AR')} c/u</div>` : '';
     return `<tr>
-      <td style="font-size:11px;color:var(--ink3);white-space:nowrap">${m.fecha}</td>
+      <td style="font-size:11px;color:var(--ink3);white-space:nowrap">${m.fecha || '—'}</td>
       <td><span class="badge ${esIngreso ? 'badge-green' : ''}" style="${esIngreso ? '' : 'background:var(--red-bg);color:var(--red)'}">${esIngreso ? '↑ Ingreso' : '↓ Gasto'}</span></td>
       <td style="font-weight:600">${personaLabel}</td>
       <td><span class="badge badge-blue" style="background:var(--surface);color:var(--ink2);border:1px solid var(--line)">${catLabel}</span></td>
-      <td>${m.desc}</td>
+      <td>${_escHtml(m.desc)}</td>
       <td><span class="pago-badge ${m.medio === 'transferencia' ? 'pago-transferencia' : 'pago-efectivo'}">${m.medio === 'transferencia' ? '🏦 Trans.' : '💵 Efec.'}</span></td>
       <td style="text-align:right;font-weight:700;color:${esIngreso ? 'var(--green)' : 'var(--red)'}">
         ${esIngreso ? '+' : '−'}$${montoMostrar.toLocaleString('es-AR')}${subLabel}
@@ -234,4 +235,213 @@ window.renderGestion = function() {
       </td>
     </tr>`;
   }).join('');
+
+  // ── GRÁFICO EVOLUCIÓN MENSUAL ──
+  renderFinanceChart(movimientos);
+
+  // ── REPORTE RESUMEN (Hoy / Semana / Mes) ──
+  renderResumenRapido(movimientos);
+
+  // ── RESUMEN ANUAL ──
+  if (typeof renderResumenAnual === 'function') renderResumenAnual(movimientos);
+
+  // ── CHECK NOTIFICACIONES ──
+  if (typeof checkNotificaciones === 'function') checkNotificaciones();
 };
+
+// ── Chart.js instance holder ──
+let _financeChart = null;
+let _financeChartHash = '';
+
+function renderFinanceChart(movimientos) {
+  const canvas = document.getElementById('chart-finance');
+  if (!canvas || typeof Chart === 'undefined') return;
+
+  const now = new Date();
+  const months = [];
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({ key: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`, label: d.toLocaleDateString('es-AR', { month: 'short' }).toUpperCase() });
+  }
+
+  const ingByMonth = {};
+  const gasByMonth = {};
+  months.forEach(m => { ingByMonth[m.key] = 0; gasByMonth[m.key] = 0; });
+
+  movimientos.forEach(m => {
+    if (m.categoria === 'gasto-costo') return;
+    const dt = parseFechaMovimiento(m.fecha);
+    if (!dt) return;
+    const key = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;
+    if (key in ingByMonth) {
+      const val = m.monto || 0;
+      if (m.tipo === 'ingreso') ingByMonth[key] += val;
+      else gasByMonth[key] += val;
+    }
+  });
+
+  const labels = months.map(m => m.label);
+  const ingData = months.map(m => ingByMonth[m.key]);
+  const gasData = months.map(m => gasByMonth[m.key]);
+  // Línea punteada: mes anterior (shifted +1)
+  const prevIngData = ingData.map((v, i) => i > 0 ? ingData[i - 1] : null);
+
+  // Hash para evitar recrear si los datos no cambiaron
+  const hash = JSON.stringify(ingData) + JSON.stringify(gasData) + JSON.stringify(prevIngData);
+  if (hash === _financeChartHash) return;
+  _financeChartHash = hash;
+
+  // Si ya existe chart, solo actualizar datos
+  if (_financeChart) {
+    _financeChart.data.labels = labels;
+    _financeChart.data.datasets[0].data = ingData;
+    _financeChart.data.datasets[1].data = gasData;
+    _financeChart.data.datasets[2].data = prevIngData;
+    _financeChart.update('none');
+    return;
+  }
+
+  _financeChart = new Chart(canvas.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Ingresos',
+          data: ingData,
+          backgroundColor: 'rgba(63, 185, 80, 0.7)',
+          borderColor: '#3fb950',
+          borderWidth: 1,
+          borderRadius: 4,
+          borderSkipped: false,
+        },
+        {
+          label: 'Gastos',
+          data: gasData,
+          backgroundColor: 'rgba(248, 81, 73, 0.6)',
+          borderColor: '#f85149',
+          borderWidth: 1,
+          borderRadius: 4,
+          borderSkipped: false,
+        },
+        {
+          label: 'Ingresos mes ant.',
+          data: prevIngData,
+          type: 'line',
+          borderColor: 'rgba(130, 80, 223, 0.8)',
+          backgroundColor: 'rgba(130, 80, 223, 0.1)',
+          borderWidth: 2,
+          borderDash: [4, 4],
+          pointRadius: 2,
+          pointBackgroundColor: 'rgba(130, 80, 223, 0.9)',
+          fill: false,
+          tension: 0.3,
+          spanGaps: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      layout: { padding: { top: 2, bottom: 0, left: 0, right: 4 } },
+      interaction: { intersect: false, mode: 'index' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0d1117',
+          titleColor: '#e6edf3',
+          bodyColor: '#8b949e',
+          borderColor: '#30363d',
+          borderWidth: 1,
+          padding: 10,
+          displayColors: true,
+          callbacks: {
+            label: (ctx) => `${ctx.dataset.label}: $${ctx.parsed.y.toLocaleString('es-AR')}`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: '#8b949e', font: { size: 8, family: "'DM Sans'" }, maxRotation: 0 }
+        },
+        y: {
+          grid: { color: 'rgba(48, 54, 61, 0.3)' },
+          ticks: {
+            color: '#8b949e',
+            font: { size: 8, family: "'DM Sans'" },
+            padding: 4,
+            callback: (v) => {
+              if (v >= 1000000) return '$' + (v / 1000000).toFixed(1) + 'M';
+              if (v >= 1000) return '$' + (v / 1000).toFixed(0) + 'k';
+              return '$' + v;
+            }
+          },
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+function renderResumenRapido(movimientos) {
+  const now = new Date();
+
+  // Helpers de rango
+  const inicioHoy = new Date(now); inicioHoy.setHours(0,0,0,0);
+  const inicioSem = new Date(now);
+  inicioSem.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1));
+  inicioSem.setHours(0,0,0,0);
+  const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  function filtrar(desde, hasta, tipo) {
+    return movimientos.filter(m => {
+      if (m.tipo !== tipo) return false;
+      const f = parseFechaMovimiento(m.fecha);
+      if (!f) return false;
+      if (f < desde) return false;
+      if (hasta && f > hasta) return false;
+      return true;
+    });
+  }
+
+  function totalMonto(arr) {
+    return arr.reduce((s, m) => s + (m.esAmbos ? (m.montoOriginal || 0) : (m.monto || 0)), 0);
+  }
+
+  // Hoy
+  const hoyIng = totalMonto(filtrar(inicioHoy, now, 'ingreso'));
+  const hoyGas = totalMonto(filtrar(inicioHoy, now, 'gasto'));
+  const hoyNeto = hoyIng - hoyGas;
+
+  // Semana
+  const semIng = totalMonto(filtrar(inicioSem, now, 'ingreso'));
+  const semGas = totalMonto(filtrar(inicioSem, now, 'gasto'));
+  const semNeto = semIng - semGas;
+
+  // Mes
+  const mesIng = totalMonto(filtrar(inicioMes, now, 'ingreso'));
+  const mesGas = totalMonto(filtrar(inicioMes, now, 'gasto'));
+  const mesNeto = mesIng - mesGas;
+
+  const fmt = (v) => (v >= 0 ? '+' : '−') + '$' + Math.abs(v).toLocaleString('es-AR');
+  const fmtNeto = (v) => (v >= 0 ? '' : '−') + '$' + Math.abs(v).toLocaleString('es-AR');
+
+  const set = (id, val, color) => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = val; if (color) el.style.color = color; }
+  };
+
+  set('res-hoy-ing', fmt(hoyIng), '#3fb950');
+  set('res-hoy-gas', fmt(hoyGas), '#f85149');
+  set('res-hoy-neto', fmtNeto(hoyNeto), hoyNeto >= 0 ? '#0d1117' : '#f85149');
+
+  set('res-sem-ing', fmt(semIng), '#3fb950');
+  set('res-sem-gas', fmt(semGas), '#f85149');
+  set('res-sem-neto', fmtNeto(semNeto), semNeto >= 0 ? '#0d1117' : '#f85149');
+
+  set('res-mes-ing', fmt(mesIng), '#3fb950');
+  set('res-mes-gas', fmt(mesGas), '#f85149');
+  set('res-mes-neto', fmtNeto(mesNeto), mesNeto >= 0 ? '#0d1117' : '#f85149');
+}

@@ -1,0 +1,287 @@
+/* ══════════════════════════════════════════════
+   DARK MODE — loaded dynamically via <link>
+   All rules use !important to override inline styles
+══════════════════════════════════════════════ */
+
+/* ── CSS VARIABLE OVERRIDES ── */
+html.dark {
+  --ink: #e6edf3;
+  --ink2: #8b949e;
+  --ink3: #6e7681;
+  --line: #30363d;
+  --line2: #21262d;
+  --surface: #0d1117;
+  --white: #161b22;
+  --blue: #58a6ff;
+  --blue-bg: rgba(56,139,253,0.15);
+  --green: #3fb950;
+  --green-bg: rgba(63,185,80,0.15);
+  --amber: #d29922;
+  --amber-bg: rgba(210,153,34,0.15);
+  --red: #f85149;
+  --red-bg: rgba(248,81,73,0.15);
+  --purple: #bc8cff;
+  --purple-bg: rgba(188,140,255,0.15);
+}
+
+/* ── GLOBAL ── */
+html.dark body { background: #010409 !important; color: #e6edf3 !important; }
+html.dark #app-content { background: #010409 !important; }
+
+/* ── BUTTONS ── */
+html.dark .btn-outline { border-color: #30363d !important; color: #8b949e !important; background: transparent !important; }
+html.dark .btn-outline:hover { background: #21262d !important; color: #e6edf3 !important; }
+html.dark .btn-primary { background: #238636 !important; }
+html.dark .btn-primary:hover { background: #2ea043 !important; }
+html.dark .signout-btn { color: #8b949e !important; }
+html.dark .signout-btn:hover { color: #f85149 !important; }
+
+/* ── HEADER / NAV ── */
+html.dark .main-head { background: #161b22 !important; border-color: #30363d !important; }
+html.dark .main-body { background: #010409 !important; }
+html.dark h2 { color: #e6edf3 !important; }
+html.dark .user-badge { background: #21262d !important; border-color: #30363d !important; color: #8b949e !important; }
+html.dark .user-badge .dot { background: #3fb950 !important; }
+
+/* ── STAT PILLS ── */
+html.dark .stat-pill { background: #0d1117 !important; border-color: #30363d !important; color: #8b949e !important; }
+html.dark .stat-pill .val { color: #e6edf3 !important; }
+
+/* ── CARDS / PANELS — generic white background ── */
+html.dark [style*="background:var(--white)"],
+html.dark [style*="background: var(--white)"] { background: #161b22 !important; border-color: #30363d !important; }
+html.dark [style*="background:var(--surface)"],
+html.dark [style*="background: var(--surface)"] { background: #0d1117 !important; border-color: #30363d !important; }
+
+/* ── DASHBOARD PANEL (already dark, keep it) ── */
+html.dark [style*="background:linear-gradient(135deg,#0d1117"] { background: linear-gradient(135deg, #0a0e14 0%, #141a22 100%) !important; }
+
+/* ── DASHBOARD SUB-PANELS (dark cards inside dashboard) ── */
+/* Green panels */
+html.dark [style*="background:rgba(26,127,55,0.15)"] { background: rgba(63,185,80,0.12) !important; }
+html.dark [style*="background:rgba(63,185,80,0.1)"] { background: rgba(63,185,80,0.08) !important; }
+/* Red panels */
+html.dark [style*="background:rgba(207,34,46,0.12)"] { background: rgba(248,81,73,0.1) !important; }
+html.dark [style*="background:rgba(248,81,73,0.1)"] { background: rgba(248,81,73,0.08) !important; }
+/* Purple panels */
+html.dark [style*="background:rgba(130,80,223,0.12)"] { background: rgba(188,140,255,0.1) !important; }
+html.dark [style*="background:rgba(130,80,223,0.3)"] { background: rgba(188,140,255,0.15) !important; border-color: rgba(188,140,255,0.25) !important; }
+/* Blue panels */
+html.dark [style*="background:rgba(88,166,255,0.1)"] { background: rgba(56,139,253,0.1) !important; }
+html.dark [style*="background:rgba(56,139,253,0.15)"] { background: rgba(56,139,253,0.12) !important; }
+/* Amber panels */
+html.dark [style*="background:rgba(210,153,34,0.12)"] { background: rgba(210,153,34,0.1) !important; }
+
+/* ── CARDS inside WC panel ── */
+html.dark [style*="background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.2)"] { background: rgba(63,185,80,0.08) !important; border-color: rgba(63,185,80,0.15) !important; }
+html.dark [style*="background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.2)"] { background: rgba(248,81,73,0.08) !important; border-color: rgba(248,81,73,0.15) !important; }
+html.dark [style*="background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.2)"] { background: rgba(56,139,253,0.08) !important; border-color: rgba(56,139,253,0.15) !important; }
+
+/* ── BORDERS with rgba ── */
+html.dark [style*="border:1px solid rgba(63,185,80,0.3)"] { border-color: rgba(63,185,80,0.2) !important; }
+html.dark [style*="border:1px solid rgba(63,185,80,0.5)"] { border-color: rgba(63,185,80,0.3) !important; }
+html.dark [style*="border:1px solid rgba(130,80,223,0.2)"] { border-color: rgba(188,140,255,0.2) !important; }
+html.dark [style*="border:1px solid rgba(207,34,46,0.2)"] { border-color: rgba(248,81,73,0.2) !important; }
+html.dark [style*="border:1px solid rgba(154,103,0,0.2)"] { border-color: rgba(210,153,34,0.2) !important; }
+html.dark [style*="border:1px solid rgba(9,105,218,0.2)"] { border-color: rgba(56,139,253,0.2) !important; }
+html.dark [style*="border:1px solid rgba(63,185,80,0.2)"] { border-color: rgba(63,185,80,0.15) !important; }
+html.dark [style*="border:1px solid rgba(248,81,73,0.2)"] { border-color: rgba(248,81,73,0.15) !important; }
+html.dark [style*="border:1px solid rgba(188,140,255,0.2)"] { border-color: rgba(188,140,255,0.15) !important; }
+
+/* ── MODALS / DIALOGS ── */
+html.dark .modal { background: #161b22 !important; border-color: #30363d !important; color: #e6edf3 !important; }
+html.dark .modal h3 { color: #e6edf3 !important; }
+html.dark .modal label { color: #8b949e !important; }
+html.dark .modal-backdrop { background: rgba(0,0,0,0.65) !important; }
+html.dark .confirm-box { background: #161b22 !important; border-color: #30363d !important; color: #e6edf3 !important; }
+html.dark .confirm-box h4 { color: #e6edf3 !important; }
+html.dark .confirm-box p { color: #8b949e !important; }
+
+/* ── INPUTS / SELECTS ── */
+html.dark input[type="text"],
+html.dark input[type="number"],
+html.dark input[type="tel"],
+html.dark input[type="date"],
+html.dark select,
+html.dark textarea {
+  background: #0d1117 !important;
+  border-color: #30363d !important;
+  color: #e6edf3 !important;
+}
+html.dark input::placeholder { color: #484f58 !important; }
+html.dark label { color: #8b949e !important; }
+
+/* ── TABLES ── */
+html.dark table { color: #e6edf3 !important; }
+html.dark thead { background: #0d1117 !important; }
+html.dark th { color: #8b949e !important; border-color: #30363d !important; background: #0d1117 !important; }
+html.dark td { border-color: #21262d !important; color: #e6edf3 !important; }
+html.dark tr:hover td { background: #161b22 !important; }
+html.dark .table-card { background: #161b22 !important; border-color: #30363d !important; }
+html.dark .table-scroll { background: #161b22 !important; }
+
+/* ── TABS ── */
+html.dark .tabs { background: #0d1117 !important; }
+html.dark .tab { color: #8b949e !important; }
+html.dark .tab.active { background: #161b22 !important; color: #e6edf3 !important; }
+
+/* ── BADGES ── */
+html.dark .badge { border-color: #30363d !important; }
+html.dark .badge-blue { background: rgba(56,139,253,0.15) !important; color: #58a6ff !important; }
+html.dark .badge-green { background: rgba(63,185,80,0.15) !important; color: #3fb950 !important; }
+html.dark .badge-amber { background: rgba(210,153,34,0.15) !important; color: #d29922 !important; }
+html.dark .badge-purple { background: rgba(188,140,255,0.15) !important; color: #bc8cff !important; }
+
+/* ── ORDEN CARDS ── */
+html.dark .orden-card { background: #161b22 !important; border-color: #30363d !important; }
+html.dark .orden-header { color: #e6edf3 !important; }
+html.dark .orden-body { background: #0d1117 !important; border-color: #30363d !important; }
+html.dark .ganancia-box { background: linear-gradient(135deg, #0d2818 0%, #1a3a2a 100%) !important; }
+html.dark .costo-row { border-color: #21262d !important; color: #e6edf3 !important; }
+html.dark .costo-row span { color: #8b949e !important; }
+
+/* ── ESTADO BADGES ── */
+html.dark .estado-pendiente { background: rgba(210,153,34,0.15) !important; color: #d29922 !important; }
+html.dark .estado-senal { background: rgba(56,139,253,0.15) !important; color: #58a6ff !important; }
+html.dark .estado-cobrado { background: rgba(63,185,80,0.15) !important; color: #3fb950 !important; }
+
+/* ── PAGO BADGES ── */
+html.dark .pago-efectivo { background: rgba(210,153,34,0.15) !important; color: #d29922 !important; }
+html.dark .pago-transferencia { background: rgba(56,139,253,0.15) !important; color: #58a6ff !important; }
+
+/* ── ACTION BUTTONS ── */
+html.dark .action-btn { color: #8b949e !important; }
+html.dark .action-btn:hover { background: rgba(248,81,73,0.15) !important; color: #f85149 !important; }
+
+/* ── FORM BLOCKS ── */
+html.dark .form-block { background: #0d1117 !important; border-color: #30363d !important; }
+
+/* ── EMPTY STATES ── */
+html.dark .empty-state { color: #8b949e !important; }
+html.dark .empty-state h3 { color: #8b949e !important; }
+html.dark .empty-state p { color: #6e7681 !important; }
+
+/* ── TOAST ── */
+html.dark #toast { background: #e6edf3 !important; color: #0d1117 !important; }
+
+/* ── SYNC INDICATOR ── */
+html.dark #sync-indicator { background: #161b22 !important; border-color: #30363d !important; color: #8b949e !important; }
+html.dark #sync-indicator .sync-dot { background: #3fb950 !important; }
+
+/* ── CHART / REPORT CARDS ── */
+html.dark #chart-finance-wrap { background: #161b22 !important; border-color: #30363d !important; }
+html.dark #reporte-resumen-wrap { background: #161b22 !important; border-color: #30363d !important; }
+
+/* ── SETTINGS / THEME TOGGLE ── */
+html.dark #theme-toggle { background: #161b22 !important; border-color: #30363d !important; color: #8b949e !important; }
+html.dark #theme-toggle:hover { background: #21262d !important; color: #e6edf3 !important; }
+html.dark #settings-toggle { background: #161b22 !important; border-color: #30363d !important; color: #8b949e !important; }
+html.dark #settings-toggle:hover { background: #21262d !important; color: #e6edf3 !important; }
+html.dark #settings-logo-preview { background: #21262d !important; }
+html.dark #app-logo { border-color: #30363d !important; }
+
+/* ── SIDEBAR ── */
+html.dark .sidebar { background: #0d1117 !important; border-color: #30363d !important; }
+html.dark .sidebar-head { background: #161b22 !important; border-color: #30363d !important; }
+html.dark .sidebar-scroll { background: #0d1117 !important; }
+html.dark .sidebar-actions { background: #0d1117 !important; border-color: #30363d !important; }
+
+/* ── SECTION TITLES ── */
+html.dark .section-title { color: #8b949e !important; }
+
+/* ── CORTE BOX ── */
+html.dark .cortes-box { background: #0d1117 !important; border-color: #30363d !important; color: #8b949e !important; }
+
+/* ── PRICE CELLS ── */
+html.dark .price-cell { color: #e6edf3 !important; }
+
+/* ── INLINE TEXT COLORS — force overrides ── */
+/* Green variants */
+html.dark [style*="color:#3fb950"] { color: #3fb950 !important; }
+html.dark [style*="color: #3fb950"] { color: #3fb950 !important; }
+html.dark [style*="color:#1a7f37"] { color: #3fb950 !important; }
+html.dark [style*="color: #1a7f37"] { color: #3fb950 !important; }
+html.dark [style*="color:#2ea043"] { color: #3fb950 !important; }
+html.dark [style*="color: #2ea043"] { color: #3fb950 !important; }
+
+/* Red variants */
+html.dark [style*="color:#f85149"] { color: #f85149 !important; }
+html.dark [style*="color: #f85149"] { color: #f85149 !important; }
+html.dark [style*="color:#cf222e"] { color: #f85149 !important; }
+html.dark [style*="color: #cf222e"] { color: #f85149 !important; }
+
+/* Purple variants */
+html.dark [style*="color:#bc8cff"] { color: #bc8cff !important; }
+html.dark [style*="color: #bc8cff"] { color: #bc8cff !important; }
+html.dark [style*="color:#8250df"] { color: #bc8cff !important; }
+html.dark [style*="color: #8250df"] { color: #bc8cff !important; }
+
+/* Blue variants */
+html.dark [style*="color:#0969da"] { color: #58a6ff !important; }
+html.dark [style*="color: #0969da"] { color: #58a6ff !important; }
+html.dark [style*="color:#58a6ff"] { color: #58a6ff !important; }
+html.dark [style*="color: #58a6ff"] { color: #58a6ff !important; }
+html.dark [style*="color:#79c0ff"] { color: #79c0ff !important; }
+html.dark [style*="color: #79c0ff"] { color: #79c0ff !important; }
+
+/* Amber variants */
+html.dark [style*="color:#d29922"] { color: #d29922 !important; }
+html.dark [style*="color: #d29922"] { color: #d29922 !important; }
+html.dark [style*="color:#e3b341"] { color: #e3b341 !important; }
+html.dark [style*="color: #e3b341"] { color: #e3b341 !important; }
+html.dark [style*="color:#9a6700"] { color: #d29922 !important; }
+html.dark [style*="color: #9a6700"] { color: #d29922 !important; }
+
+/* Gray variants */
+html.dark [style*="color:#6e7681"] { color: #6e7681 !important; }
+html.dark [style*="color: #6e7681"] { color: #6e7681 !important; }
+html.dark [style*="color:#8b949e"] { color: #8b949e !important; }
+html.dark [style*="color: #8b949e"] { color: #8b949e !important; }
+
+/* White text — keep white in dark mode */
+html.dark [style*="color:white"] { color: #e6edf3 !important; }
+html.dark [style*="color: white"] { color: #e6edf3 !important; }
+html.dark [style*="color:#ffffff"] { color: #e6edf3 !important; }
+html.dark [style*="color: #ffffff"] { color: #e6edf3 !important; }
+
+/* ── INLINE BACKGROUND COLORS — force overrides ── */
+html.dark [style*="background:rgba(63,185,80,0.04)"] { background: rgba(63,185,80,0.06) !important; }
+html.dark [style*="background:rgba(248,81,73,0.04)"] { background: rgba(248,81,73,0.06) !important; }
+html.dark [style*="background:rgba(26,127,55,0.04)"] { background: rgba(63,185,80,0.06) !important; }
+html.dark [style*="background:rgba(255,255,255,0.07)"] { background: rgba(255,255,255,0.04) !important; }
+html.dark [style*="background:rgba(255,255,255,0.08)"] { background: rgba(255,255,255,0.04) !important; }
+html.dark [style*="background:rgba(100,116,139,0.1)"] { background: rgba(100,116,139,0.15) !important; }
+
+/* ── INLINE BORDER COLORS with rgba ── */
+html.dark [style*="border-color:rgba(130,80,223,0.2)"] { border-color: rgba(188,140,255,0.2) !important; }
+html.dark [style*="border-color:rgba(63,185,80,0.2)"] { border-color: rgba(63,185,80,0.2) !important; }
+html.dark [style*="border-color:rgba(248,81,73,0.2)"] { border-color: rgba(248,81,73,0.2) !important; }
+html.dark [style*="border-color:rgba(154,103,0,0.2)"] { border-color: rgba(210,153,34,0.2) !important; }
+html.dark [style*="border-color:rgba(9,105,218,0.2)"] { border-color: rgba(56,139,253,0.2) !important; }
+
+/* ── MAIN HEAD h2 ── */
+html.dark .main-head h2 { color: #e6edf3 !important; }
+
+/* ── RESPERONSIVE sidebar ── */
+@media (max-width: 600px) {
+  html.dark .sidebar-actions { background: #0d1117 !important; border-color: #30363d !important; }
+}
+
+/* ── SCROLLBARS ── */
+html.dark ::-webkit-scrollbar { width: 6px; }
+html.dark ::-webkit-scrollbar-track { background: #0d1117; }
+html.dark ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+html.dark ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+/* ── GLOBAL SEARCH ── */
+html.dark #global-search { background: #161b22 !important; border-color: #30363d !important; color: #e6edf3 !important; }
+
+/* ── OT FILTERS ── */
+html.dark #ot-filtro-busqueda { background: #161b22 !important; border-color: #30363d !important; color: #e6edf3 !important; }
+html.dark #ot-filtro-estado,
+html.dark #ot-filtro-persona,
+html.dark #ot-filtro-desde,
+html.dark #ot-filtro-hasta { background: #161b22 !important; border-color: #30363d !important; color: #e6edf3 !important; }
+
+/* ── CLIENTES ── */
+html.dark #cliente-busqueda { background: #161b22 !important; border-color: #30363d !important; color: #e6edf3 !important; }

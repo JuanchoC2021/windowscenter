@@ -7,6 +7,7 @@
 window.movimientos       = [];
 window.ordenesTrabajoData = [];
 window.descuentosWC      = [];
+window.clientesData      = [];
 
 // ── SALDO FAVOR/DEBE DE UNA PERSONA (Adrian / Enzo) ──
 // saldo = (gasto-costo) - (retiro-caja)

@@ -73,7 +73,7 @@ pinBoxes.forEach((box, i) => {
   // Pegar desde clipboard
   box.addEventListener('paste', (e) => {
     e.preventDefault();
-    const pasted = (e.clipboardData || window.clipboardData)
+    const pasted = e.clipboardData
       .getData('text')
       .replace(/[^0-9]/g, '')
       .slice(0, 6);

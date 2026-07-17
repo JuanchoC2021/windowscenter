@@ -28,7 +28,7 @@ function setPeriodo(p) {
       hasta.value = hoy.toISOString().slice(0,10);
     }
   }
-  renderGestion();
+  if (typeof renderGestion === 'function') renderGestion();
 }
 
 function parseFechaMovimiento(fechaStr) {

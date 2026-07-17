@@ -1,8 +1,52 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Helper: solo usuarios autenticados
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Helper: el doc id debe coincidir con el campo id
+    function idMatches() {
+      return request.resource.data.id == request.resource.id;
+    }
+
+    // ── MOVIMIENTOS ──
+    match /movimientos/{movId} {
+      allow read: if isAuth();
+      allow create: if isAuth() && idMatches();
+      allow update: if isAuth();
+      allow delete: if isAuth();
+    }
+
+    // ── ÓRDENES DE TRABAJO ──
+    match /ordenesTrabajo/{otId} {
+      allow read: if isAuth();
+      allow create: if isAuth() && idMatches();
+      allow update: if isAuth();
+      allow delete: if isAuth();
+    }
+
+    // ── DESCUENTOS WINDOWSCENTER ──
+    match /descuentosWC/{wcId} {
+      allow read: if isAuth();
+      allow create: if isAuth() && idMatches();
+      allow update: if isAuth();
+      allow delete: if isAuth();
+    }
+
+    // ── CLIENTES ──
+    match /clientes/{cliId} {
+      allow read: if isAuth();
+      allow create: if isAuth() && idMatches();
+      allow update: if isAuth();
+      allow delete: if isAuth();
+    }
+
+    // Bloquear cualquier otra colección no definida
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if false;
     }
   }
 }

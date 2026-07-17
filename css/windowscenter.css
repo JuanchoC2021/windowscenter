@@ -1,20 +1,19 @@
-/* ── SYNC INDICATOR (estado de conexión con Firebase / WindowsCenter) ── */
+/* ── SYNC INDICATOR ── */
 #sync-indicator {
-  position: fixed; top: 10px; right: 16px; z-index: 999;
+  position: fixed; bottom: 80px; right: 12px; z-index: 999;
   display: flex; align-items: center; gap: 6px;
   padding: 5px 10px; border-radius: 20px;
   font-size: 11px; font-weight: 600;
   background: var(--green-bg); color: var(--green);
   border: 1px solid var(--green);
-  transition: all 0.3s;
+  transition: opacity 0.4s, visibility 0.4s;
   pointer-events: none;
+  opacity: 0; visibility: hidden;
 }
+#sync-indicator.visible { opacity: 1; visibility: visible; }
 #sync-indicator.syncing { background: var(--amber-bg); color: var(--amber); border-color: var(--amber); }
 #sync-indicator.error   { background: var(--red-bg);   color: var(--red);   border-color: var(--red); }
 #sync-indicator.offline { background: var(--surface);  color: var(--ink3);  border-color: var(--line2); }
-.sync-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: currentColor; flex-shrink: 0;
-}
+.sync-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
 .sync-dot.pulse { animation: pulse 1.5s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }

@@ -4,13 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>WindowsCenter Pro</title>
+<meta name="theme-color" content="#0d1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="css/main.css">
 <link rel="stylesheet" href="css/gestion.css">
 <link rel="stylesheet" href="css/ordenes.css">
 <link rel="stylesheet" href="css/windowscenter.css">
+<link id="dark-css" rel="stylesheet" href="css/dark.css" disabled>
 <link rel="stylesheet" href="css/auth.css">
 </head>
 <body>
@@ -26,8 +32,7 @@
 
   <div class="login-card">
     <div class="login-logo">
-      <div class="login-logo-mark">WC</div>
-      <div class="login-logo-text">WindowsCenter</div>
+      <div class="login-logo-text" style="font-size:24px;margin-top:8px">WindowsCenter</div>
     </div>
     <div class="login-subtitle">Gestión del Taller</div>
     <form id="login-form">
@@ -70,15 +75,25 @@
   <span id="sync-text">Conectando…</span>
 </div>
 
-
-
-<!-- GESTIÓN DEL TALLER -->
-<div id="view-gestion">
-
   <div class="main-head" style="flex-shrink:0;flex-direction:column;align-items:stretch;gap:12px">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-      <h2>💰 Gestión del Taller</h2>
       <div style="display:flex;align-items:center;gap:10px">
+        <div id="app-logo" style="width:72px;height:72px;border-radius:50%;background:transparent;display:none;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;margin:-8px 0">
+          <img id="app-logo-img" src="" style="width:100%;height:100%;object-fit:contain;display:none">
+        </div>
+        <h2>💰 Gestión del Taller</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="position:relative">
+          <input type="text" id="global-search" placeholder="🔍 Buscar…" oninput="buscarGlobalDebounced(this.value)" onkeydown="if(event.key==='Enter'){clearTimeout(_buscarTimer);buscarGlobal(this.value)}" style="width:140px;padding:5px 10px 5px 28px;border:1px solid var(--line);border-radius:20px;font-size:11px;background:var(--surface);color:var(--ink);transition:width 0.2s" onfocus="this.style.width=220px" onblur="setTimeout(()=>this.style.width='140px',200)">
+          <svg style="position:absolute;left:8px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--ink3)" width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04Z"/></svg>
+        </div>
+        <button id="theme-toggle" onclick="toggleTheme()" title="Modo oscuro" style="width:26px;height:26px;border-radius:50%;background:transparent;border:1px solid var(--line);color:var(--ink3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;padding:0;flex-shrink:0">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0-1.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Zm5.657-8.157a.75.75 0 0 1 0 1.061l-1.061 1.06a.75.75 0 1 1-1.06-1.06l1.06-1.06a.75.75 0 0 1 1.06 0ZM9.657 14.657a.75.75 0 0 1 0-1.06l1.06-1.061a.75.75 0 1 1 1.06 1.06l-1.06 1.061a.75.75 0 0 1-1.06 0ZM3.146 5.354a.75.75 0 0 1 0 1.06L2.086 6.475a.75.75 0 0 1-1.06-1.061l1.06-1.06a.75.75 0 0 1 1.06 0Zm8.293 8.293a.75.75 0 0 1-1.06 0l-1.061-1.06a.75.75 0 0 1 1.06-1.061l1.06 1.06a.75.75 0 0 1 0 1.06ZM2 8a.75.75 0 0 1-.75.75H.75a.75.75 0 0 1 0-1.5h.5A.75.75 0 0 1 2 8Zm12 0a.75.75 0 0 1-.75.75h-.5a.75.75 0 0 1 0-1.5h.5A.75.75 0 0 1 14 8ZM7.5 14v.5a.75.75 0 0 1-1.5 0v-.5a.75.75 0 0 1 1.5 0ZM4 2.5a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 4 2.5ZM7.5 2v.5a.75.75 0 0 1-1.5 0V2a.75.75 0 0 1 1.5 0Z"/></svg>
+        </button>
+        <button id="settings-toggle" onclick="abrirSettings()" title="Configuración" style="width:26px;height:26px;border-radius:50%;background:transparent;border:1px solid var(--line);color:var(--ink3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;padding:0;flex-shrink:0">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8.2 8.2 0 0 1 .701.031C9.444.095 9.99.645 10.16 1.29l.288 1.107c.018.066.079.158.212.224.231.114.454.243.664.384.12.086.21.195.274.315.04.078.076.16.107.245.057.158.074.34.036.51L10.61 3.82a5.97 5.97 0 0 1 1.18 3.58c0 1.53-.585 2.93-1.542 3.975a5.32 5.32 0 0 1-3.975 1.542c-1.53 0-2.93-.585-3.975-1.542A5.32 5.32 0 0 1 1.56 8.67a5.97 5.97 0 0 1 1.18-3.58l1.402-1.096c.031-.085.067-.167.107-.245.064-.12.154-.229.274-.315a3.1 3.1 0 0 1 .664-.384c.133-.066.194-.158.212-.224l.288-1.107C8.01.645 8.556.095 9.299.03 9.1.01 8.9 0 8 0Zm0 1.5a6.7 6.7 0 0 0-.575.025C6.902 1.58 6.536 1.926 6.37 2.38l-.288 1.107a1.6 1.6 0 0 0-.135.497c-.012.076-.028.146-.046.214l-.483 1.874a4.47 4.47 0 0 0-.865 2.664c0 1.173.448 2.24 1.18 3.04a3.82 3.82 0 0 0 3.04 1.18c1.173 0 2.24-.448 3.04-1.18a4.47 4.47 0 0 0 1.18-3.04c0-.94-.32-1.81-.865-2.664l-.483-1.874a3 3 0 0 0-.046-.214 1.6 1.6 0 0 0-.135-.497l-.288-1.107c-.166-.454-.532-.8-1.047-.875A6.7 6.7 0 0 0 8 1.5ZM5.5 8a2.5 2.5 0 1 1 5 0 2.5 2.5 0 0 1-5 0Z"/></svg>
+        </button>
         <div class="user-badge"><span class="dot"></span><span id="user-email"></span></div>
         <button class="signout-btn" onclick="cerrarSesion()">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.75C2 1.784 2.784 1 3.75 1h2.5a.75.75 0 0 1 0 1.5h-2.5a.25.25 0 0 0-.25.25v10.5c0 .138.112.25.25.25h2.5a.75.75 0 0 1 0 1.5h-2.5A1.75 1.75 0 0 1 2 13.25Zm10.44-4.75a.75.75 0 0 1 .75-.75h1.06a.25.25 0 0 0 .25-.25V4a.75.75 0 0 1 1.5 0v2.5a1.75 1.75 0 0 1-1.75 1.75H12.19a.75.75 0 0 1-.75-.75ZM6.22 6.22a.75.75 0 0 1 0 1.06L4.56 8.94a.75.75 0 1 1-1.06-1.06l1.66-1.66a.75.75 0 0 1 1.06 0Zm2.56 0a.75.75 0 0 1 1.06 0l1.66 1.66a.75.75 0 1 1-1.06 1.06l-1.66-1.66a.75.75 0 0 1 0-1.06Z"/></svg>
@@ -97,7 +112,7 @@
     <div style="display:flex;gap:4px">
       <button id="gtab-main-finanzas" onclick="switchGMain('finanzas')" class="btn btn-outline btn-sm" style="font-size:12px;background:var(--ink);color:white;border-color:var(--ink)">📊 Finanzas</button>
       <button id="gtab-main-ordenes"  onclick="switchGMain('ordenes')"  class="btn btn-outline btn-sm" style="font-size:12px">📦 Órdenes de Trabajo</button>
-      <button id="gtab-main-windowscenter" onclick="switchGMain('windowscenter')" class="btn btn-outline btn-sm" style="font-size:12px;color:#3fb950;border-color:rgba(63,185,80,0.5)">🏢 WindowsCenter</button>
+      <button id="gtab-main-clientes" onclick="switchGMain('clientes')" class="btn btn-outline btn-sm" style="font-size:12px;color:#bc8cff;border-color:rgba(130,80,223,0.5)">👤 Clientes</button>
     </div>
   </div>
 
@@ -215,7 +230,7 @@
           <span id="g-barra-pct">—</span>
         </div>
         <div style="height:7px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden">
-          <div style="height:100%;background:linear-gradient(90deg,#3fb950,#2ea043);border-radius:4px;transition:width .4s ease" id="g-barra-ing" style="width:0%"></div>
+          <div style="height:100%;background:linear-gradient(90deg,#3fb950,#2ea043);border-radius:4px;transition:width .4s ease;width:0%" id="g-barra-ing"></div>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:10px;margin-top:4px">
           <span style="color:#3fb950" id="g-barra-ing-label">$0 ingresado</span>
@@ -223,6 +238,77 @@
         </div>
       </div>
     </div>
+
+    <!-- ══ GRÁFICO INGRESOS VS GASTOS ══ -->
+    <div style="background:var(--white);border:1px solid var(--line);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:20px" id="chart-finance-wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:0.3px">Evolución mensual</div>
+          <div style="font-size:10px;color:var(--ink3);margin-top:2px">Últimos 12 meses</div>
+        </div>
+        <div style="display:flex;gap:12px">
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="width:8px;height:8px;border-radius:2px;background:#3fb950"></span>
+            <span style="font-size:9px;color:var(--ink3);font-weight:600">Ingresos</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="width:8px;height:8px;border-radius:2px;background:#f85149"></span>
+            <span style="font-size:9px;color:var(--ink3);font-weight:600">Gastos</span>
+          </div>
+        </div>
+      </div>
+      <div style="position:relative;height:110px;overflow:hidden">
+        <canvas id="chart-finance"></canvas>
+      </div>
+    </div>
+
+    <!-- ══ REPORTE RESUMEN ══ -->
+    <div style="background:var(--white);border:1px solid var(--line);border-radius:var(--radius-lg);padding:18px;margin-bottom:20px" id="reporte-resumen-wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:0.3px">Resumen rápido</div>
+          <div style="font-size:10px;color:var(--ink3);margin-top:2px">Hoy · Semana · Mes</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px" id="resumen-periodos">
+        <div style="background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px">
+          <div style="font-size:10px;font-weight:600;color:var(--ink3);text-transform:uppercase;margin-bottom:8px">📅 Hoy</div>
+          <div id="res-hoy-ing" style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:2px">+$0</div>
+          <div style="font-size:9px;color:var(--ink3);margin-bottom:6px">ingresos</div>
+          <div id="res-hoy-gas" style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:2px">−$0</div>
+          <div style="font-size:9px;color:var(--ink3);margin-bottom:6px">gastos</div>
+          <div style="border-top:1px solid var(--line);padding-top:6px;margin-top:2px">
+            <div style="font-size:9px;color:var(--ink3)">Neto</div>
+            <div id="res-hoy-neto" style="font-size:15px;font-weight:700;color:var(--ink)">$0</div>
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px">
+          <div style="font-size:10px;font-weight:600;color:var(--ink3);text-transform:uppercase;margin-bottom:8px">📊 Semana</div>
+          <div id="res-sem-ing" style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:2px">+$0</div>
+          <div style="font-size:9px;color:var(--ink3);margin-bottom:6px">ingresos</div>
+          <div id="res-sem-gas" style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:2px">−$0</div>
+          <div style="font-size:9px;color:var(--ink3);margin-bottom:6px">gastos</div>
+          <div style="border-top:1px solid var(--line);padding-top:6px;margin-top:2px">
+            <div style="font-size:9px;color:var(--ink3)">Neto</div>
+            <div id="res-sem-neto" style="font-size:15px;font-weight:700;color:var(--ink)">$0</div>
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px">
+          <div style="font-size:10px;font-weight:600;color:var(--ink3);text-transform:uppercase;margin-bottom:8px">📈 Mes</div>
+          <div id="res-mes-ing" style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:2px">+$0</div>
+          <div style="font-size:9px;color:var(--ink3);margin-bottom:6px">ingresos</div>
+          <div id="res-mes-gas" style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:2px">−$0</div>
+          <div style="font-size:9px;color:var(--ink3);margin-bottom:6px">gastos</div>
+          <div style="border-top:1px solid var(--line);padding-top:6px;margin-top:2px">
+            <div style="font-size:9px;color:var(--ink3)">Neto</div>
+            <div id="res-mes-neto" style="font-size:15px;font-weight:700;color:var(--ink)">$0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ RESUMEN ANUAL ══ -->
+    <div style="background:var(--white);border:1px solid var(--line);border-radius:var(--radius-lg);padding:18px;margin-bottom:20px" id="resumen-anual"></div>
 
     <!-- ══ FORMULARIO PRINCIPAL ══ -->
     <div style="background:var(--white);border:1px solid var(--line);border-radius:var(--radius-lg);padding:18px;margin-bottom:20px">
@@ -407,6 +493,12 @@
             <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 1.5a.25.25 0 0 0-.25.25v11.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 8 4.25V1.5Zm5.5.75v2a.25.25 0 0 0 .25.25h2Z"/><path d="M2 1.75C2 .784 2.784 0 3.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 12.25 15h-8.5A1.75 1.75 0 0 1 2 13.25Z"/></svg>
             Exportar Excel
           </button>
+          <button class="btn btn-outline btn-sm" onclick="exportarBackupJSON()" style="color:var(--blue);border-color:var(--blue);font-size:11px;gap:4px">
+            📦 Backup JSON
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="triggerImportBackup()" style="color:var(--blue);border-color:var(--blue);font-size:11px;gap:4px">
+            📥 Importar JSON
+          </button>
           <button class="btn btn-outline btn-sm" onclick="limpiarGestion()" style="color:var(--red);border-color:var(--red);font-size:11px">🗑 Limpiar todo</button>
         </div>
         <!-- Fila 2: filtros -->
@@ -518,13 +610,15 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
         <div>
           <label>Fecha estimada de entrega</label>
-          <input type="text" id="ot-fecha-entrega" placeholder="Ej: 20/06/2025">
+          <input type="date" id="ot-fecha-entrega">
         </div>
         <div>
           <label>Estado</label>
           <select id="ot-estado">
-            <option value="pendiente">⏳ Pendiente</option>
-            <option value="senal">💰 Con seña</option>
+            <option value="crear">📝 Crear</option>
+            <option value="pendiente" selected>⏳ Pendiente</option>
+            <option value="en-proceso">🔨 En proceso</option>
+            <option value="entregada">📦 Entregada</option>
             <option value="cobrado">✅ Cobrado</option>
           </select>
         </div>
@@ -568,6 +662,39 @@
       </button>
     </div>
 
+    <!-- Alertas pagos pendientes -->
+    <div id="ot-alertas" style="background:rgba(210,153,34,0.08);border:1px solid rgba(210,153,34,0.25);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:16px;display:none"></div>
+
+    <!-- Entregas próximas -->
+    <div id="ot-entregas-proximas" style="background:rgba(248,81,73,0.06);border:1px solid rgba(248,81,73,0.2);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:16px;display:none"></div>
+
+    <!-- Agenda semanal -->
+    <div id="ot-agenda-semanal" style="background:var(--white);border:1px solid var(--line);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:16px"></div>
+
+    <!-- Filtros de OT -->
+    <div style="background:var(--white);border:1px solid var(--line);border-radius:var(--radius-lg);padding:12px 16px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:12px;font-weight:600;color:var(--ink2)">🔍 Filtrar:</span>
+        <input type="text" id="ot-filtro-busqueda" placeholder="Buscar cliente, desc…" oninput="aplicarFiltroOT()" style="padding:5px 10px;border:1px solid var(--line2);border-radius:6px;font-size:12px;width:180px;background:var(--surface);color:var(--ink)">
+        <select id="ot-filtro-estado" onchange="aplicarFiltroOT()" style="padding:5px 8px;border:1px solid var(--line2);border-radius:6px;font-size:12px;background:var(--surface);color:var(--ink)">
+          <option value="todos">Todos los estados</option>
+          <option value="crear">📝 Crear</option>
+          <option value="pendiente">⏳ Pendiente</option>
+          <option value="en-proceso">🔨 En proceso</option>
+          <option value="entregada">📦 Entregada</option>
+          <option value="cobrado">✅ Cobrado</option>
+        </select>
+        <select id="ot-filtro-persona" onchange="aplicarFiltroOT()" style="padding:5px 8px;border:1px solid var(--line2);border-radius:6px;font-size:12px;background:var(--surface);color:var(--ink)">
+          <option value="todos">Todos</option>
+          <option value="windowscenter">WindowsCenter</option>
+        </select>
+        <input type="date" id="ot-filtro-desde" onchange="aplicarFiltroOT()" style="padding:5px 8px;border:1px solid var(--line2);border-radius:6px;font-size:12px;width:140px">
+        <span style="font-size:11px;color:var(--ink3)">→</span>
+        <input type="date" id="ot-filtro-hasta" onchange="aplicarFiltroOT()" style="padding:5px 8px;border:1px solid var(--line2);border-radius:6px;font-size:12px;width:140px">
+        <span id="ot-filtro-count" style="font-size:11px;color:var(--ink3);white-space:nowrap"></span>
+      </div>
+    </div>
+
     <!-- Lista de órdenes -->
     <div id="ot-lista" style="display:flex;flex-direction:column;gap:12px">
       <div class="empty-state" style="background:var(--white);border:1px solid var(--line);border-radius:var(--radius-lg);padding:60px">
@@ -579,103 +706,32 @@
 
   </div><!-- /gpanel-ordenes -->
 
-  <!-- ══ PANEL WINDOWSCENTER ══ -->
-  <div id="gpanel-windowscenter" style="display:none">
-
-    <!-- Header empresa -->
-    <div style="background:linear-gradient(135deg,#0d1117 0%,#1c2128 100%);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;position:relative;overflow:hidden">
-      <div style="position:absolute;top:-30px;right:-30px;width:140px;height:140px;background:rgba(63,185,80,0.06);border-radius:50%"></div>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-        <div style="width:42px;height:42px;background:rgba(9,105,218,0.25);border:1.5px solid rgba(9,105,218,0.5);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#79c0ff;flex-shrink:0">WC</div>
-        <div>
-          <div style="color:white;font-weight:700;font-size:16px">WindowsCenter</div>
-          <div style="color:rgba(255,255,255,0.4);font-size:11px">Empresa — Resumen de caja y descuentos</div>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
-        <div style="background:rgba(63,185,80,0.12);border:1px solid rgba(63,185,80,0.25);border-radius:8px;padding:12px">
-          <div style="font-size:10px;color:#3fb950;text-transform:uppercase;font-weight:600;letter-spacing:.08em">📥 Caja bruta del taller</div>
-          <div style="font-size:22px;font-weight:700;color:#3fb950;margin-top:4px" id="wc-detail-caja">$0</div>
-          <div style="font-size:10px;color:rgba(63,185,80,0.5);margin-top:2px">Todos los ingresos − gastos</div>
-        </div>
-        <div style="background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.2);border-radius:8px;padding:12px">
-          <div style="font-size:10px;color:#f85149;text-transform:uppercase;font-weight:600;letter-spacing:.08em">↓ Total descontado</div>
-          <div style="font-size:22px;font-weight:700;color:#f85149;margin-top:4px" id="wc-detail-descuentos">$0</div>
-          <div style="font-size:10px;color:rgba(248,81,73,0.5);margin-top:2px" id="wc-detail-desc-count">0 descuentos registrados</div>
-        </div>
-        <div style="background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.25);border-radius:8px;padding:12px">
-          <div style="font-size:10px;color:#79c0ff;text-transform:uppercase;font-weight:600;letter-spacing:.08em">💼 Saldo neto WC</div>
-          <div style="font-size:22px;font-weight:700;margin-top:4px" id="wc-detail-neto">$0</div>
-          <div style="font-size:10px;color:rgba(88,166,255,0.4);margin-top:2px">Caja − Descuentos</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Formulario nuevo descuento -->
+  <!-- ══ CLIENTES ══ -->
+  <div id="gpanel-clientes" style="display:none">
     <div style="background:var(--white);border:1px solid var(--line);border-radius:var(--radius-lg);padding:18px;margin-bottom:20px">
-      <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:14px;display:flex;align-items:center;gap:8px">
-        <span>➖ Registrar descuento a WindowsCenter</span>
+      <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:14px">👤 Base de Clientes</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px">
+        <input type="text" id="cliente-busqueda" placeholder="Buscar cliente…" oninput="renderClientes()" style="flex:1;padding:8px 12px;border:1px solid var(--line2);border-radius:6px;font-size:13px;background:var(--surface);color:var(--ink)">
+        <span id="clientes-count" style="font-size:11px;color:var(--ink3);white-space:nowrap"></span>
+        <button class="btn btn-outline btn-sm" onclick="abrirCrearCliente()" style="font-size:11px;padding:6px 12px;color:var(--purple);border-color:var(--purple);white-space:nowrap">➕ Crear cliente</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1.5fr 1fr 1fr 1fr auto;gap:10px;align-items:end">
-        <div>
-          <label>Tipo de descuento</label>
-          <select id="wc-tipo">
-            <option value="gasto-empresa">🔧 Gasto empresa</option>
-            <option value="otro">📋 Otro</option>
-          </select>
-        </div>
-        <div>
-          <label>Descripción</label>
-          <input type="text" id="wc-desc" placeholder="Ej: Sueldo mayo, retiro en efectivo…">
-        </div>
-        <div>
-          <label>Monto ($)</label>
-          <input type="number" id="wc-monto" placeholder="0" min="0" onkeydown="if(event.key==='Enter')addDescuentoWC()">
-        </div>
-        <div>
-          <label>Medio de pago</label>
-          <select id="wc-medio">
-            <option value="efectivo">💵 Efectivo</option>
-            <option value="transferencia">🏦 Transferencia</option>
-          </select>
-        </div>
-        <div>
-          <label>Fecha</label>
-          <input type="text" id="wc-fecha-input" placeholder="dd/mm/aaaa" style="font-size:12px">
-        </div>
-        <button class="btn btn-primary btn-sm" style="white-space:nowrap;padding:9px 18px;font-size:13px;background:#cf222e;border-color:#cf222e" onclick="addDescuentoWC()">Registrar</button>
-      </div>
+      <div id="clientes-lista" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
 
-    <!-- Historial de descuentos -->
-    <div class="table-card">
-      <div style="padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <span style="font-size:13px;font-weight:600;flex:1">📋 Historial de descuentos a WindowsCenter</span>
-        <button class="btn btn-outline btn-sm" onclick="limpiarDescuentosWC()" style="color:var(--red);border-color:var(--red);font-size:11px">🗑 Limpiar todo</button>
+    <!-- Detalle cliente seleccionado -->
+    <div id="cliente-detalle" style="display:none;background:var(--white);border:1px solid var(--line);border-radius:var(--radius-lg);padding:18px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <button class="btn btn-outline btn-sm" onclick="cerrarClienteDetalle()" style="font-size:11px">← Volver</button>
+        <div id="cliente-detalle-nombre" style="font-size:15px;font-weight:700;color:var(--ink)"></div>
       </div>
-      <div class="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Tipo</th>
-              <th>Descripción</th>
-              <th>Medio</th>
-              <th style="text-align:right">Monto</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="wc-historial-body">
-            <tr><td colspan="6"><div class="empty-state" style="padding:40px"><div class="empty-icon">🏢</div><h3>Sin descuentos registrados</h3><p>Registrá sueldos, retiros o saldos a favor para descontarlos de la caja de WindowsCenter.</p></div></td></tr>
-          </tbody>
-        </table>
-      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px" id="cliente-detalle-stats"></div>
+      <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:8px;text-transform:uppercase">Historial de órdenes</div>
+      <div id="cliente-detalle-ots" style="display:flex;flex-direction:column;gap:8px"></div>
     </div>
-
-  </div><!-- /gpanel-windowscenter -->
+  </div><!-- /gpanel-clientes -->
 
   </div><!-- /main-body -->
-</div><!-- /view-gestion -->
+</div><!-- /app-content-wrap -->
 
 <!-- MODAL EDITAR ORDEN -->
 <div class="modal-backdrop" id="modal-editar-ot">
@@ -694,12 +750,14 @@
       </div>
       <div><label>Estado</label>
         <select id="eot-estado">
+          <option value="crear">📝 Crear</option>
           <option value="pendiente">⏳ Pendiente</option>
-          <option value="senal">💰 Con seña</option>
+          <option value="en-proceso">🔨 En proceso</option>
+          <option value="entregada">📦 Entregada</option>
           <option value="cobrado">✅ Cobrado</option>
         </select>
       </div>
-      <div><label>Fecha entrega</label><input type="text" id="eot-fecha-entrega"></div>
+      <div><label>Fecha entrega</label><input type="date" id="eot-fecha-entrega"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">
       <div><label>Precio venta ($)</label><input type="number" id="eot-venta" min="0"></div>
@@ -723,6 +781,45 @@
     </div>
   </div>
 </div>
+
+<!-- MODAL EDITAR COSTOS OT -->
+<div class="modal-backdrop" id="modal-editar-costos-ot">
+  <div class="modal" style="width:550px;max-width:96vw;max-height:90vh;overflow-y:auto">
+    <h3>📋 Editar costos del trabajo</h3>
+    <input type="hidden" id="ecot-id">
+    <div style="font-size:12px;color:var(--ink3);margin-bottom:12px" id="ecot-cliente-label"></div>
+    <div style="background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:12px">
+      <div id="ecot-costos-lista"></div>
+      <div style="display:flex;justify-content:flex-end;padding-top:8px;font-size:12px;color:var(--ink3)" id="ecot-total-row">
+        Total: <span style="font-weight:700;color:var(--red);margin-left:6px" id="ecot-total-costos">$0</span>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:600;color:var(--ink2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Agregar costo</div>
+      <div style="display:grid;grid-template-columns:1fr 100px;gap:8px;margin-bottom:8px">
+        <input type="text" id="ecot-costo-desc" placeholder="Concepto del costo">
+        <input type="number" id="ecot-costo-monto" placeholder="Monto" min="0">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <select id="ecot-costo-origen">
+          <option value="windowscenter">🏢 WindowsCenter</option>
+          <option value="adrian">👤 Adrian</option>
+          <option value="enzo">👤 Enzo</option>
+        </select>
+        <select id="ecot-costo-medio">
+          <option value="efectivo">💵 Efectivo</option>
+          <option value="transferencia">🏦 Transferencia</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="agregarCostoExistenteOT()" style="height:34px">+ Agregar</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="cerrarModalEditarCostosOT()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="guardarCostosOT()">💾 Guardar costos</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 
@@ -742,7 +839,137 @@
   </div>
 </div>
 
+<!-- MODAL SETTINGS / LOGO -->
+<div class="modal-backdrop" id="modal-settings">
+  <div class="modal" style="width:400px;max-width:96vw">
+    <h3>⚙️ Configuración</h3>
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:8px">Logo del sistema</div>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
+        <div id="settings-logo-preview" style="width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#0969da,#0550ae);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px;overflow:hidden;flex-shrink:0">
+          <img id="settings-logo-img" src="LOGO FINAL_REDONDO.png" style="display:block;width:100%;height:100%;object-fit:contain">
+          <span id="settings-logo-text" style="display:none">WC</span>
+        </div>
+        <div style="flex:1">
+          <input type="file" id="logo-file-input" accept="image/*" style="display:none" onchange="handleLogoUpload(event)">
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('logo-file-input').click()" style="margin-bottom:6px;width:100%">📤 Subir imagen</button>
+          <button class="btn btn-outline btn-sm" onclick="quitarLogo()" style="width:100%;color:var(--red)">🗑️ Quitar logo (usar texto)</button>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--ink3)">Se muestra en el login y en el encabezado. Formatos: JPG, PNG, SVG. Máx 500KB.</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-sm" onclick="cerrarSettings()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- /app-content -->
+
+<!-- Hidden file input for backup import -->
+<input type="file" id="import-backup-input" accept=".json" style="display:none" onchange="importarBackupJSON(event)">
+
+<!-- MODAL CLIENTE -->
+<div class="modal-backdrop" id="modal-cliente">
+  <div class="modal" style="width:440px;max-width:96vw">
+    <h3 id="modal-cliente-title">➕ Crear cliente</h3>
+    <input type="hidden" id="cli-id">
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:12px;color:var(--ink2);margin-bottom:4px;font-weight:500">Nombre *</label>
+      <input type="text" id="cli-nombre" placeholder="Nombre del cliente" style="width:100%;padding:10px 12px;border:1px solid var(--line2);border-radius:8px;font-size:13px;background:var(--surface);color:var(--ink)">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div>
+        <label style="display:block;font-size:12px;color:var(--ink2);margin-bottom:4px;font-weight:500">Teléfono</label>
+        <input type="tel" id="cli-telefono" placeholder="11 1234-5678" style="width:100%;padding:10px 12px;border:1px solid var(--line2);border-radius:8px;font-size:13px;background:var(--surface);color:var(--ink)">
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;color:var(--ink2);margin-bottom:4px;font-weight:500">Email</label>
+        <input type="email" id="cli-email" placeholder="correo@ejemplo.com" style="width:100%;padding:10px 12px;border:1px solid var(--line2);border-radius:8px;font-size:13px;background:var(--surface);color:var(--ink)">
+      </div>
+    </div>
+    <div style="margin-bottom:16px">
+      <label style="display:block;font-size:12px;color:var(--ink2);margin-bottom:4px;font-weight:500">Notas</label>
+      <textarea id="cli-notas" rows="3" placeholder="Dirección, referencias, etc." style="width:100%;padding:10px 12px;border:1px solid var(--line2);border-radius:8px;font-size:13px;background:var(--surface);color:var(--ink);resize:vertical;min-height:60px"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="cerrarModalCliente()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="guardarCliente()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BOTÓN GASTO RÁPIDO (FAB) ══ -->
+<div id="fab-gasto-rapido" onclick="abrirGastoRapido()" style="position:fixed;bottom:28px;right:28px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#f85149,#da3633);color:white;font-size:28px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(248,81,73,0.4);z-index:900;transition:transform 0.2s" title="Gasto rápido">+</div>
+
+<!-- ══ MODAL GASTO RÁPIDO ══ -->
+<div class="modal-backdrop" id="modal-gasto-rapido">
+  <div class="modal" style="max-width:400px">
+    <h3>💸 Gasto rápido</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div style="grid-column:1/-1">
+        <label>Descripción</label>
+        <input type="text" id="qr-desc" placeholder="Ej: Combustible, Comida…">
+      </div>
+      <div>
+        <label>Monto ($)</label>
+        <input type="number" id="qr-monto" placeholder="0" min="0">
+      </div>
+      <div>
+        <label>Medio</label>
+        <select id="qr-medio" style="width:100%;padding:8px 12px;border:1px solid var(--line2);border-radius:6px;font-size:13px;background:var(--surface);color:var(--ink)">
+          <option value="efectivo">💵 Efectivo</option>
+          <option value="transferencia">🏦 Transferencia</option>
+        </select>
+      </div>
+      <div>
+        <label>Categoría</label>
+        <select id="qr-categoria" style="width:100%;padding:8px 12px;border:1px solid var(--line2);border-radius:6px;font-size:13px;background:var(--surface);color:var(--ink)">
+          <option value="combustible">🚗 Combustible</option>
+          <option value="comida">🍔 Comida</option>
+          <option value="materiales">📦 Materiales</option>
+          <option value="accesorios">🔧 Accesorios</option>
+          <option value="herramientas">🛠️ Herramientas</option>
+          <option value="gasto-otro">📋 Otro</option>
+        </select>
+      </div>
+      <div>
+        <label>Persona</label>
+        <select id="qr-persona" style="width:100%;padding:8px 12px;border:1px solid var(--line2);border-radius:6px;font-size:13px;background:var(--surface);color:var(--ink)">
+          <option value="windowscenter">🏢 WindowsCenter</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="cerrarGastoRapido()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="guardarGastoRapido()" style="background:#f85149">Guardar gasto</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL RENOMBRAR CLIENTE ══ -->
+<div class="modal-backdrop" id="modal-renombrar-cliente">
+  <div class="modal" style="max-width:400px">
+    <h3>✏️ Renombrar cliente</h3>
+    <p style="font-size:12px;color:var(--ink3);margin-bottom:12px">Se actualizará el nombre en todas las órdenes de trabajo de este cliente.</p>
+    <input type="hidden" id="rc-old-nombre">
+    <div style="margin-bottom:10px">
+      <label>Nombre actual</label>
+      <input type="text" id="rc-nombre-actual" readonly style="background:var(--surface);color:var(--ink3)">
+    </div>
+    <div style="margin-bottom:10px">
+      <label>Nuevo nombre</label>
+      <input type="text" id="rc-nuevo-nombre" placeholder="Nuevo nombre del cliente">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="cerrarModalRenombrar()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="renombrarCliente()">Renombrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL CONFIRMAR RENOMBRAR ══ -->
+<div id="confirm-container"></div>
 
 <!-- ══════════════════════════════════════════════
      FIREBASE SDK (módulo ES) — init, refs y listeners realtime
@@ -763,6 +990,12 @@
 <script src="js/modules/gestion.js"></script>
 <script src="js/modules/ordenes.js"></script>
 <script src="js/modules/windowscenter.js"></script>
+<script src="js/modules/estados.js"></script>
+<script src="js/modules/buscar.js"></script>
+<script src="js/modules/backup.js"></script>
+<script src="js/modules/shortcuts.js"></script>
+<script src="js/modules/notificaciones.js"></script>
+<script src="js/modules/clientes.js"></script>
 
 <script src="js/ui/renderFinanzas.js"></script>
 <script src="js/ui/renderOrdenes.js"></script>

@@ -59,12 +59,12 @@ async function addMovimiento() {
     const { setDoc, doc, db } = window._fb;
     if (persona === 'ambos') {
       const mitad = Math.round(monto / 2);
-      const id1 = Date.now().toString();
-      const id2 = (Date.now() + 1).toString();
+      const id1 = crypto.randomUUID();
+      const id2 = crypto.randomUUID();
       await setDoc(doc(db, "movimientos", id1), { id: id1, fecha: fechaSolo, tipo, persona: 'enzo',   categoria, desc, monto: mitad, medio, esAmbos: true, montoOriginal: monto });
       await setDoc(doc(db, "movimientos", id2), { id: id2, fecha: fechaSolo, tipo, persona: 'adrian', categoria, desc, monto: mitad, medio, esAmbos: true, montoOriginal: 0 });
     } else {
-      const id = Date.now().toString();
+      const id = crypto.randomUUID();
       await setDoc(doc(db, "movimientos", id), { id, fecha: fechaSolo, tipo, persona, categoria, desc, monto, medio, esAmbos: false, montoOriginal: monto });
     }
     window._fb.setSyncStatus('synced', 'Sincronizado ✓');
@@ -72,7 +72,7 @@ async function addMovimiento() {
     document.getElementById('g-monto').value = '';
     document.getElementById('g-fecha').value = '';
     showToast(tipo === 'ingreso' ? '✓ Ingreso registrado' : '✓ Gasto registrado');
-  } catch(e) { showToast('❌ Error al registrar'); console.error(e); }
+  } catch(e) { window._fb.setSyncStatus('error', 'Error'); showToast('❌ Error al registrar'); console.error(e); }
 }
 
 // ── RETIROS Y GASTOS GENÉRICOS (ADRIAN & ENZO) ──
@@ -102,7 +102,7 @@ async function addPersonaTransaccion(persona, categoria) {
   const hoy = new Date();
   const fecha = hoy.toLocaleDateString('es-AR');
 
-  const id = Date.now().toString() + '_' + Math.random().toString(36).slice(2, 8);
+  const id = crypto.randomUUID();
 
   try {
     window._fb.setSyncStatus('syncing', 'Guardando…');
@@ -125,6 +125,7 @@ async function addPersonaTransaccion(persona, categoria) {
     const tipoTexto = categoria === 'retiro-caja' ? 'Retiro' : 'Gasto';
     showToast(`✓ ${tipoTexto} de ${persona.charAt(0).toUpperCase() + persona.slice(1)} registrado`);
   } catch(e) {
+    window._fb.setSyncStatus('error', 'Error');
     showToast('❌ Error al registrar');
     console.error(e);
   }
@@ -173,7 +174,7 @@ async function borrarMovimiento(id) {
     }
     window._fb.setSyncStatus('synced', 'Sincronizado ✓');
     showToast('✓ Movimiento eliminado');
-  } catch(e) { showToast('❌ Error al eliminar: ' + e.message); console.error('borrarMovimiento error:', e); }
+  } catch(e) { window._fb.setSyncStatus('error', 'Error'); showToast('❌ Error al eliminar: ' + e.message); console.error('borrarMovimiento error:', e); }
 }
 
 // ── LIMPIAR GESTIÓN ──
@@ -203,25 +204,84 @@ async function limpiarGestion() {
         for (const b of chunks) await b.commit();
         window._fb.setSyncStatus('synced', 'Sincronizado ✓');
         showToast('✓ Todos los movimientos eliminados');
-      } catch(e) { showToast('❌ Error al limpiar: ' + e.message); console.error('limpiarGestion error:', e); }
+      } catch(e) { window._fb.setSyncStatus('error', 'Error'); showToast('❌ Error al limpiar: ' + e.message); console.error('limpiarGestion error:', e); }
     }
   });
 }
 
-// ── NAVEGACIÓN TABS GESTIÓN (Finanzas / Órdenes / WindowsCenter) ──
+// ── NAVEGACIÓN TABS GESTIÓN (Finanzas / Órdenes / WindowsCenter / Clientes) ──
 function switchGMain(tab) {
-  const isFinanzas = tab === 'finanzas';
-  const isOrdenes  = tab === 'ordenes';
-  const isWC       = tab === 'windowscenter';
-  document.getElementById('gpanel-finanzas').style.display      = isFinanzas ? 'block' : 'none';
-  document.getElementById('gpanel-ordenes').style.display       = isOrdenes  ? 'block' : 'none';
-  document.getElementById('gpanel-windowscenter').style.display = isWC       ? 'block' : 'none';
-  const btnF = document.getElementById('gtab-main-finanzas');
-  const btnO = document.getElementById('gtab-main-ordenes');
-  const btnW = document.getElementById('gtab-main-windowscenter');
-  btnF.style.background  = isFinanzas ? 'var(--ink)' : ''; btnF.style.color = isFinanzas ? 'white' : ''; btnF.style.borderColor = isFinanzas ? 'var(--ink)' : '';
-  btnO.style.background  = isOrdenes  ? 'var(--ink)' : ''; btnO.style.color = isOrdenes  ? 'white' : ''; btnO.style.borderColor = isOrdenes  ? 'var(--ink)' : '';
-  btnW.style.background  = isWC       ? '#1a7f37'    : ''; btnW.style.color = isWC       ? 'white' : ''; btnW.style.borderColor = isWC       ? '#1a7f37'    : '';
-  if (isOrdenes) renderOrdenesTrabajoLista();
-  if (isWC) renderDescuentosWC();
+  try {
+    const isFinanzas  = tab === 'finanzas';
+    const isOrdenes   = tab === 'ordenes';
+    const isClientes  = tab === 'clientes';
+    const panels = [
+      { id: 'gpanel-finanzas',      show: isFinanzas },
+      { id: 'gpanel-ordenes',       show: isOrdenes },
+      { id: 'gpanel-clientes',      show: isClientes }
+    ];
+    panels.forEach(p => {
+      const el = document.getElementById(p.id);
+      if (el) el.style.display = p.show ? 'block' : 'none';
+    });
+    const btnF = document.getElementById('gtab-main-finanzas');
+    const btnO = document.getElementById('gtab-main-ordenes');
+    const btnC = document.getElementById('gtab-main-clientes');
+    if (btnF) { btnF.style.background  = isFinanzas  ? 'var(--ink)' : ''; btnF.style.color = isFinanzas  ? 'white' : ''; btnF.style.borderColor = isFinanzas  ? 'var(--ink)' : ''; }
+    if (btnO) { btnO.style.background  = isOrdenes   ? 'var(--ink)' : ''; btnO.style.color = isOrdenes   ? 'white' : ''; btnO.style.borderColor = isOrdenes   ? 'var(--ink)' : ''; }
+    if (btnC) { btnC.style.background  = isClientes  ? '#8250df'    : ''; btnC.style.color = isClientes  ? 'white' : ''; btnC.style.borderColor = isClientes  ? '#8250df'    : ''; }
+    if (isOrdenes) renderOrdenesTrabajoLista();
+    if (isClientes) renderClientes();
+  } catch(err) {
+    console.error('switchGMain error:', err);
+  }
 }
+
+// ── GASTO RÁPIDO (FAB) ──
+function abrirGastoRapido() {
+  document.getElementById('qr-desc').value = '';
+  document.getElementById('qr-monto').value = '';
+  document.getElementById('qr-medio').value = 'efectivo';
+  document.getElementById('qr-categoria').value = 'combustible';
+  document.getElementById('qr-persona').value = 'windowscenter';
+  document.getElementById('modal-gasto-rapido').classList.add('open');
+  setTimeout(function() { var el = document.getElementById('qr-desc'); if (el) el.focus(); }, 100);
+}
+
+function cerrarGastoRapido() {
+  document.getElementById('modal-gasto-rapido').classList.remove('open');
+}
+
+async function guardarGastoRapido() {
+  var desc = document.getElementById('qr-desc').value.trim();
+  var monto = parseFloat(document.getElementById('qr-monto').value);
+  var medio = document.getElementById('qr-medio').value;
+  var categoria = document.getElementById('qr-categoria').value;
+  var persona = document.getElementById('qr-persona').value;
+  if (!desc) { showToast('⚠️ Ingresá una descripción'); return; }
+  if (!monto || monto <= 0) { showToast('⚠️ Ingresá un monto válido'); return; }
+  try {
+    window._fb.setSyncStatus('syncing', 'Guardando…');
+    var _fb = window._fb;
+    var hoy = new Date();
+    var fechaSolo = hoy.toLocaleDateString('es-AR');
+    var fechaStr = fechaSolo + ' ' + hoy.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+    var id = crypto.randomUUID();
+    await _fb.setDoc(_fb.doc(_fb.db, "movimientos", id), {
+      id: id, fecha: fechaSolo, tipo: 'gasto', persona: persona,
+      categoria: categoria, desc: desc, monto: monto, medio: medio,
+      esAmbos: false, montoOriginal: monto
+    });
+    _fb.setSyncStatus('synced', 'Sincronizado ✓');
+    cerrarGastoRapido();
+    showToast('✓ Gasto registrado: −$' + monto.toLocaleString('es-AR'));
+  } catch(e) {
+    window._fb.setSyncStatus('error', 'Error');
+    showToast('❌ Error al guardar');
+    console.error('guardarGastoRapido:', e);
+  }
+}
+
+window.abrirGastoRapido = abrirGastoRapido;
+window.cerrarGastoRapido = cerrarGastoRapido;
+window.guardarGastoRapido = guardarGastoRapido;
